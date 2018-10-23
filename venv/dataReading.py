@@ -69,8 +69,8 @@ def create_inverted_list():
         inverted_list[key] = sorted_list
 
 
-def get_dictionaries():
-    add_folder_inverted_dictionary(data_path)
+def get_dictionaries(path):
+    add_folder_inverted_dictionary(path)
     create_inverted_list()
     return inverted_dictionary, inverted_list
 
