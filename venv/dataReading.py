@@ -69,6 +69,12 @@ def create_inverted_list():
         inverted_list[key] = sorted_list
 
 
+def get_dictionaries():
+    add_folder_inverted_dictionary(data_path)
+    create_inverted_list()
+    return inverted_dictionary, inverted_list
+
+
 if __name__ == "__main__":
     data_path = input("Please write the path to the folder that contains the data \n")
     print("We are treating the data from " + data_path)
