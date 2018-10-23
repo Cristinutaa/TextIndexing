@@ -76,6 +76,8 @@ if __name__ == "__main__":
     add_folder_inverted_dictionary(data_path)
     create_inverted_list()
     print("The treatment took %s seconds" % (time.time() - startTime))
+    if not os.path.exists("resources"):
+        os.makedirs("resources")
     export_json = input(
             "Should we export the result dictionary with dictionaries in a json? (yes/anything else) \n")
     if export_json == "yes":
@@ -83,7 +85,7 @@ if __name__ == "__main__":
         f = open("resources/dict_with_dict.json", "w")
         f.write(json_dict)
         f.close()
-        print("Saved in resources/dict_with_dict.json! Have a nice day!")
+        print("Saved in resources/dict_with_dict.json!")
     export_json = input(
             "Should we export the result dictionary with lists in a json? (yes/anything else) \n")
     if export_json == "yes":
