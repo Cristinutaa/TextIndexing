@@ -20,9 +20,10 @@ nb_documents = 0
 def update_inverted_dictionary(array, doc_id):
     global inverted_dictionary
     global inverted_list
-    ps = PorterStemmer()
-    for word in array:
-        item = ps.stem(word)
+    #ps = PorterStemmer()
+    #word
+    for item in array:
+        #item = ps.stem(word)
         if item in sw:
             continue
         elif item in inverted_dictionary:
