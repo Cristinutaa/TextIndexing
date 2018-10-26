@@ -14,6 +14,7 @@ nltk.download('stopwords')
 sw = stopwords.words('english')
 inverted_dictionary = {}
 inverted_list = {}
+nb_documents = 0
 
 
 def update_inverted_dictionary(array, doc_id):
@@ -58,6 +59,7 @@ def add_folder_inverted_dictionary(folder):
             data = "<root>" + my_file.read() + "</root>"
             root = ET.fromstring(data)
             for doc in root.findall("DOC"):
+                nb_documents += 1
                 doc_id = doc.find("DOCID").text.split()[0]
                 add_doc_inverted_dictionary(doc, doc_id)
 
@@ -72,7 +74,7 @@ def create_inverted_list():
 def get_dictionaries(path):
     add_folder_inverted_dictionary(path)
     create_inverted_list()
-    return inverted_dictionary, inverted_list
+    return inverted_dictionary, inverted_list, nb_documents
 
 
 if __name__ == "__main__":
