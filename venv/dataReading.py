@@ -18,6 +18,8 @@ nb_documents = 0
 
 
 def update_inverted_dictionary(array, doc_id):
+    global inverted_dictionary
+    global inverted_list
     ps = PorterStemmer()
     for word in array:
         item = ps.stem(word)
@@ -54,12 +56,13 @@ def add_doc_inverted_dictionary(doc, doc_id):
 
 
 def add_folder_inverted_dictionary(folder):
+    global nb_documents
     for file in os.listdir(folder):
         with open(folder + "/" + file, "r") as my_file:
             data = "<root>" + my_file.read() + "</root>"
             root = ET.fromstring(data)
             for doc in root.findall("DOC"):
-                nb_documents += 1
+                nb_documents = nb_documents + 1
                 doc_id = doc.find("DOCID").text.split()[0]
                 add_doc_inverted_dictionary(doc, doc_id)
 
@@ -84,6 +87,7 @@ if __name__ == "__main__":
     add_folder_inverted_dictionary(data_path)
     create_inverted_list()
     print("The treatment took %s seconds" % (time.time() - startTime))
+    print("Nombre de documents %d" % nb_documents)
     if not os.path.exists("resources"):
         os.makedirs("resources")
     export_json = input(
