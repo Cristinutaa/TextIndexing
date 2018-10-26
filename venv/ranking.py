@@ -1,5 +1,6 @@
 import json
 from sortedcontainers import SortedDict
+from nltk.stem import PorterStemmer
 
 
 def prepare_query(query):
@@ -19,11 +20,13 @@ def naive(query, dict_struct):
     :param dict_struct: First structure of the IF whose values are also dicts
     :return: list of ranked docs id
     """
+    ps = PorterStemmer()
     docs_score = {}
     query_words = prepare_query(query)
     for qt in query_words:
         qt = qt.lower()
         qt = qt.strip() # strip takes care about parasite spaces in the query term
+        qt = ps.stem(qt) # finally, we stem the word
         # We have to check if at least one doc contains the qt
         if qt not in dict_struct:
             continue
@@ -46,7 +49,7 @@ def naive(query, dict_struct):
 
 
 if __name__ == "__main__":
-    query = " OR monday OR tortillon" # forbid the nothingness (will give an empty list)
+    query = "january" # forbid the nothingness (will give an empty list)
     # dict_struct = {
     #     "a": {
     #         1: 3,
