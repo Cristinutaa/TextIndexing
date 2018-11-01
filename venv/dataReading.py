@@ -9,9 +9,12 @@ import operator
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
+#personal imports
+import configuration
 
 nltk.download('stopwords')
 sw = stopwords.words('english')
+corpus_by_doc_id = dict()
 inverted_dictionary = {}
 inverted_list = {}
 nb_documents = 0
@@ -20,19 +23,30 @@ nb_documents = 0
 def update_inverted_dictionary(array, doc_id):
     global inverted_dictionary
     global inverted_list
-    #ps = PorterStemmer()
-    #word
-    for item in array:
-        #item = ps.stem(word)
-        if item in sw:
-            continue
-        elif item in inverted_dictionary:
-            if doc_id in inverted_dictionary[item]:
-                inverted_dictionary[item][doc_id] += 1
+    if configuration.stemming:
+        ps = PorterStemmer()
+        for word in array:
+            item = ps.stem(word)
+            if item in sw:
+                continue
+            elif item in inverted_dictionary:
+                if doc_id in inverted_dictionary[item]:
+                    inverted_dictionary[item][doc_id] += 1
+                else:
+                    inverted_dictionary[item][doc_id] = 1
             else:
-                inverted_dictionary[item][doc_id] = 1
-        else:
-            inverted_dictionary[item] = {doc_id: 1}
+                inverted_dictionary[item] = {doc_id: 1}
+    else:
+        for item in array:
+            if item in sw:
+                continue
+            elif item in inverted_dictionary:
+                if doc_id in inverted_dictionary[item]:
+                    inverted_dictionary[item][doc_id] += 1
+                else:
+                    inverted_dictionary[item][doc_id] = 1
+            else:
+                inverted_dictionary[item] = {doc_id: 1}
 
 
 def treat_text(doc_text):
@@ -51,6 +65,7 @@ def add_doc_inverted_dictionary(doc, doc_id):
     for node in doc:
         for p in node.findall("P"):
             text = text + ' ' + p.text
+    corpus_by_doc_id[doc_id] = text
     text = treat_text(text)
     words = text.split()
     update_inverted_dictionary(words, doc_id)
@@ -59,13 +74,14 @@ def add_doc_inverted_dictionary(doc, doc_id):
 def add_folder_inverted_dictionary(folder):
     global nb_documents
     for file in os.listdir(folder):
-        with open(folder + "/" + file, "r") as my_file:
-            data = "<root>" + my_file.read() + "</root>"
-            root = ET.fromstring(data)
-            for doc in root.findall("DOC"):
-                nb_documents = nb_documents + 1
-                doc_id = doc.find("DOCID").text.split()[0]
-                add_doc_inverted_dictionary(doc, doc_id)
+        if "." not in file: #file is without extension
+            with open(folder + "/" + file, "r") as my_file:
+                data = "<root>" + my_file.read() + "</root>"
+                root = ET.fromstring(data)
+                for doc in root.findall("DOC"):
+                    nb_documents = nb_documents + 1
+                    doc_id = doc.find("DOCID").text.split()[0]
+                    add_doc_inverted_dictionary(doc, doc_id)
 
 
 def create_inverted_list():
@@ -82,13 +98,13 @@ def get_dictionaries(path):
 
 
 if __name__ == "__main__":
-    data_path = input("Please write the path to the folder that contains the data \n")
-    print("We are treating the data from " + data_path)
+    data_path = configuration.get_row_data_path()
     startTime = time.time()
     add_folder_inverted_dictionary(data_path)
     create_inverted_list()
     print("The treatment took %s seconds" % (time.time() - startTime))
     print("Nombre de documents %d" % nb_documents)
+
     if not os.path.exists("resources"):
         os.makedirs("resources")
     export_json = input(
@@ -106,4 +122,12 @@ if __name__ == "__main__":
         f = open("resources/dict_with_list.json", "w")
         f.write(json_list)
         f.close()
-        print("Saved in resources/dict_with_list.json! Have a nice day!")
+        print("Saved in resources/dict_with_list.json!")
+    export_json = input(
+            "Should we export the corpus dictionary in a json file? (yes/anything else) \n")
+    if export_json == "yes":
+        json_list = json.dumps(corpus_by_doc_id)
+        f = open("resources/corpus_by_doc_id.json", "w")
+        f.write(json_list)
+        f.close()
+        print("Saved in resources/corpus_by_doc_id.json! Have a nice day!")

@@ -1,16 +1,51 @@
 import json
-from sortedcontainers import SortedDict
 from nltk.stem import PorterStemmer
-from dataReading import inverted_dictionary
+import os
+import random
+from sortedcontainers import SortedDict
 
-def prepare_query(query):
+#personal imports
+import configuration
+import dataReading
+
+
+dict_struct = dict()
+corpus_by_doc_id = dict()
+
+
+def display_result_query(ranked_docs):
     """
-    :param query: the query in string to convert into a list of "conjuncted" words/terms
-    :return: a set of query terms
+    :param ranked_docs: sorted list of id of documents
+    :return: None -  display text
     """
-    query_words = query.split(" OR ")
-    query_words = set(query_words)  # only keeps unique words
-    return query_words
+    print("The result of your query:")
+    rank = 0
+    for doc_id in ranked_docs:
+        rank = rank+1
+        print("RANK:" + str(rank) + " - DOC_ID:"+str(doc_id))
+    display_docs = True if input("Do you want to display the content of the docs? (yes/no)\n").lower() == "yes" else False
+    if display_docs:
+        rank = 0
+        for doc_id in ranked_docs:
+            rank = rank+1
+            print("RANK:" + str(rank) + " - DOC_ID:"+str(doc_id))
+            print(corpus_by_doc_id[doc_id])
+
+
+def generate_query(randomly=True):
+    """
+    :param randomly: Default = True. If False, the user will choose the terms of the query.
+    :return: String containing a certain number of terms, separated with "OR"
+    """
+    if randomly:
+        nb_terms = random.randint(1, 4)
+        terms = []
+        for i in range(0, nb_terms):
+            terms.append(random.choice(dict_struct.keys()))
+        return " OR ".join(terms)
+    else:
+        query = input("Please write your query (terms are separated by 'OR')\n")
+        return query.upper()
 
 
 def naive(query, dict_struct):
@@ -48,30 +83,28 @@ def naive(query, dict_struct):
     return ranked_docs
 
 
+def prepare_query(query):
+    """
+    :param query: the query in string to convert into a list of "conjuncted" words/terms
+    :return: a set of query terms
+    """
+    query_words = query.split(" OR ")
+    query_words = set(query_words)  # only keeps unique words
+    return query_words
+
+
 if __name__ == "__main__":
-    query = "january" # forbid the nothingness (will give an empty list)
-    # dict_struct = {
-    #     "a": {
-    #         1: 3,
-    #         2: 1
-    #     },
-    #     "b": {
-    #         1: 1,
-    #         2: 1
-    #     },
-    #     "c": {
-    #         1: 1,
-    #         2: 1
-    #     },
-    #     "d": {
-    #         2: 3
-    #     }
-    # }
-    #F:\laela\Desktop\PDC - Text Indexing\TextIndexing\venv\resources\dict_with_dict.json
-    data_path = input("Please write the path to the dict with dict json that contains the data \n")
-    file = open(data_path)
-    dict_struct = json.load(file)
-    dict_struct = SortedDict(dict_struct)
-    # for k, v in dict_struct.items():
-    #     print("k:", k, "; v:", v)
-    print(naive(query,dict_struct))
+    json_path = configuration.get_json_path()
+    for file in os.listdir(json_path):
+        if file == "dict_with_dict.json":
+            file = open(json_path + "\\" + file)
+            dict_struct = json.load(file)
+            dict_struct = SortedDict(dict_struct)
+        elif file == "corpus_by_doc_id.json":
+            file = open(json_path + "\\" + file)
+            corpus_by_doc_id = json.load(file)
+
+    query = generate_query(True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
+    print("Your query is : " + query)
+    ranked_docs = naive(query, dict_struct)
+    display_result_query(ranked_docs)
