@@ -1,7 +1,7 @@
 import json
 from sortedcontainers import SortedDict
 from nltk.stem import PorterStemmer
-
+from dataReading import inverted_dictionary
 
 def prepare_query(query):
     """
@@ -20,13 +20,13 @@ def naive(query, dict_struct):
     :param dict_struct: First structure of the IF whose values are also dicts
     :return: list of ranked docs id
     """
-    ps = PorterStemmer()
+    #ps = PorterStemmer()
     docs_score = {}
     query_words = prepare_query(query)
     for qt in query_words:
         qt = qt.lower()
         qt = qt.strip() # strip takes care about parasite spaces in the query term
-        qt = ps.stem(qt) # finally, we stem the word
+        #qt = ps.stem(qt) # finally, we stem the word
         # We have to check if at least one doc contains the qt
         if qt not in dict_struct:
             continue
@@ -67,8 +67,9 @@ if __name__ == "__main__":
     #         2: 3
     #     }
     # }
-    #file = open("resources/dict_with_dict.json")
-    file = open("F:\Ecole\Insa-5e_annee\Indexing\saved_inverted/dict_with_dict.json")
+    #F:\laela\Desktop\PDC - Text Indexing\TextIndexing\venv\resources\dict_with_dict.json
+    data_path = input("Please write the path to the dict with dict json that contains the data \n")
+    file = open(data_path)
     dict_struct = json.load(file)
     dict_struct = SortedDict(dict_struct)
     # for k, v in dict_struct.items():
