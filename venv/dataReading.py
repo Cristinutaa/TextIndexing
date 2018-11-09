@@ -73,8 +73,8 @@ def add_doc_inverted_dictionary(doc, doc_id):
 
 def add_folder_inverted_dictionary(folder):
     global nb_documents
-    for file in os.listdir(folder)[0:10]:
-        if "." not in file:  # file is without extension
+    for file in os.listdir(folder):
+        if "." not in file: #file is without extension
             with open(folder + "/" + file, "r") as my_file:
                 data = "<root>" + my_file.read() + "</root>"
                 root = ET.fromstring(data)
@@ -82,31 +82,18 @@ def add_folder_inverted_dictionary(folder):
                     nb_documents = nb_documents + 1
                     doc_id = doc.find("DOCID").text.split()[0]
                     add_doc_inverted_dictionary(doc, doc_id)
-                    if nb_documents % 10 == 0:
-                        save_inverted(nb_documents / 10)
 
-    save_inverted(nb_documents / 10 + 1)
-
-
-def save_inverted(number):
-    global inverted_dictionary
-    global inverted_list
+def create_inverted_list():
     for key in inverted_dictionary.keys():
         doc_dict = inverted_dictionary[key]
-        sorted_list = sorted(doc_dict.items(), key=operator.itemgetter(0))
+        sorted_list =  sorted(doc_dict.items(), key=operator.itemgetter(1), reverse=True)
         inverted_list[key] = sorted_list
-    final_list = sorted(inverted_list.items(), key=operator.itemgetter(0))
-    file = open("resources/file_%d" % number, "w+")
-    line = ""
-    for word in final_list:
-        line += word[0] + "|"
-        for document in word[1]:
-            line += str(document[0]) + ":" + str(document[1]) + "; "
-        line += "\n"
-    file.write(line)
-    file.close()
-    inverted_dictionary = {}
-    inverted_list = {}
+
+
+def get_dictionaries(path):
+    add_folder_inverted_dictionary(path)
+    create_inverted_list()
+    return inverted_dictionary, inverted_list, nb_documents
 
 
 # Gives the score for a term with regards to a document
@@ -123,5 +110,33 @@ if __name__ == "__main__":
     data_path = configuration.get_row_data_path()
     startTime = time.time()
     add_folder_inverted_dictionary(data_path)
+    create_inverted_list()
     print("The treatment took %s seconds" % (time.time() - startTime))
     print("Nombre de documents %d" % nb_documents)
+
+    if not os.path.exists("resources"):
+        os.makedirs("resources")
+    export_json = input(
+            "Should we export the result dictionary with dictionaries in a json? (yes/anything else) \n")
+    if export_json == "yes":
+        json_dict = json.dumps(inverted_dictionary)
+        f = open("resources/dict_with_dict.json", "w")
+        f.write(json_dict)
+        f.close()
+        print("Saved in resources/dict_with_dict.json!")
+    export_json = input(
+            "Should we export the result dictionary with lists in a json? (yes/anything else) \n")
+    if export_json == "yes":
+        json_list = json.dumps(inverted_list)
+        f = open("resources/dict_with_list.json", "w")
+        f.write(json_list)
+        f.close()
+        print("Saved in resources/dict_with_list.json!")
+    export_json = input(
+            "Should we export the corpus dictionary in a json file? (yes/anything else) \n")
+    if export_json == "yes":
+        json_list = json.dumps(corpus_by_doc_id)
+        f = open("resources/corpus_by_doc_id.json", "w")
+        f.write(json_list)
+        f.close()
+        print("Saved in resources/corpus_by_doc_id.json! Have a nice day!")
