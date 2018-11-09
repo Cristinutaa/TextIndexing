@@ -9,7 +9,7 @@ import operator
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-#personal imports
+# personal imports
 import configuration
 
 nltk.download('stopwords')
@@ -74,7 +74,7 @@ def add_doc_inverted_dictionary(doc, doc_id):
 def add_folder_inverted_dictionary(folder):
     global nb_documents
     for file in os.listdir(folder)[0:10]:
-        if "." not in file: #file is without extension
+        if "." not in file:  # file is without extension
             with open(folder + "/" + file, "r") as my_file:
                 data = "<root>" + my_file.read() + "</root>"
                 root = ET.fromstring(data)
@@ -85,7 +85,7 @@ def add_folder_inverted_dictionary(folder):
                     if nb_documents % 10 == 0:
                         save_inverted(nb_documents / 10)
 
-    save_inverted(nb_documents/10 + 1)
+    save_inverted(nb_documents / 10 + 1)
 
 
 def save_inverted(number):
@@ -107,6 +107,16 @@ def save_inverted(number):
     file.close()
     inverted_dictionary = {}
     inverted_list = {}
+
+
+# Gives the score for a term with regards to a document
+# n : Frequency of the term in the document
+# d : Number of documents that contain the term
+def tf_idf(n, d):
+    score = 0
+    if n > 0:
+        score = (1 + math.log(n)) * math.log(nb_documents / (1 + d))
+    return score
 
 
 if __name__ == "__main__":
