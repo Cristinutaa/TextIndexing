@@ -54,6 +54,8 @@ def treat_text(doc_text):
     punctuation = '!"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~'
     for char in punctuation:
         doc_text = doc_text.replace(char, " ")
+    doc_text = re.sub(r"(\B')", " ", doc_text, flags=re.M)
+    doc_text = re.sub(r"('\B)", " ", doc_text, flags=re.M)
     doc_text = re.sub(r"(\d+\S*)", "<number>", doc_text, flags=re.M)
     doc_text = doc_text.lower()
     #   text = ' '.join(text.split())
@@ -73,7 +75,7 @@ def add_doc_inverted_dictionary(doc, doc_id):
 
 def add_folder_inverted_dictionary(folder):
     global nb_documents
-    for file in os.listdir(folder)[0:10]:
+    for file in os.listdir(folder):
         if "." not in file: #file is without extension
             with open(folder + "/" + file, "r") as my_file:
                 data = "<root>" + my_file.read() + "</root>"
@@ -82,10 +84,10 @@ def add_folder_inverted_dictionary(folder):
                     nb_documents = nb_documents + 1
                     doc_id = doc.find("DOCID").text.split()[0]
                     add_doc_inverted_dictionary(doc, doc_id)
-                    if nb_documents % 10 == 0:
-                        save_inverted(nb_documents / 10)
+                    if nb_documents % 1000 == 0:
+                        save_inverted(nb_documents / 1000)
 
-    save_inverted(nb_documents/10 + 1)
+    save_inverted(nb_documents/1000 + 1)
 
 
 def save_inverted(number):
@@ -108,8 +110,13 @@ def save_inverted(number):
     inverted_dictionary = {}
     inverted_list = {}
 
+def delete_folder_files(folder):
+    for file in os.listdir(folder):
+        os.remove(folder+ "\\" + file)
+
 
 if __name__ == "__main__":
+    delete_folder_files("resources")
     data_path = configuration.get_row_data_path()
     startTime = time.time()
     add_folder_inverted_dictionary(data_path)
