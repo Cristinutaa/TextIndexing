@@ -1,5 +1,6 @@
 import json
 from nltk.stem import PorterStemmer
+import numpy as np
 import os
 import time
 import random
@@ -8,11 +9,14 @@ from sortedcontainers import SortedDict
 #personal imports
 import configuration
 import dataReading
+import random_indexing
 
 
 dict_struct = dict()
 corpus_by_doc_id = dict()
 dict_list = dict()
+context_vectors = dict()
+index_vectors = dict()
 
 
 def display_result_query(ranked_docs):
@@ -173,6 +177,7 @@ def prepare_query(query):
     for i in range(len(query_words)):
         query_words[i] = query_words[i].lower()
         query_words[i] = query_words[i].strip()
+    #random_indexing.find_similar_vectors(query_words, context_vectors)
     return query_words
 
 
@@ -203,10 +208,19 @@ if __name__ == "__main__":
         elif file == "corpus_by_doc_id.json":
             file = open(json_path + "\\" + file)
             corpus_by_doc_id = json.load(file)
+        elif file == "index_vectors.json":
+            file = open(json_path + "\\" + file)
+            index_vectors = json.load(file)
+        elif file == "context_vectors.json":
+            file = open(json_path + "\\" + file)
+            context_vectors = json.load(file)
     print("dict_struct length:", len(dict_struct))
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
 
+    startTime = time.time()
+    index_vectors, context_vectors = random_indexing.build_index_and_context_vectors(dict_struct)
+    print("time spent:", time.time() - startTime)
 
     query = generate_query(True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
     print("Your query is : " + query)
