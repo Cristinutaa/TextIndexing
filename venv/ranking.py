@@ -192,6 +192,23 @@ def remove_nonexisting_terms(qts, dict_struct):
     return newqts
 
 
+def ask_query():
+    """A function to represent the process of asking queries to user"""
+    query = generate_query(
+        True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
+    print("Your query is : " + query)
+    opt = -117
+    while opt not in [0, 1]:
+        opt = int(input("Do you want to use naive or fagin's algorithm? Naive:0, Fagin's:1\n"))
+    if opt == 0:
+        ranked_docs, duration = naive(query, dict_struct)
+    else:
+        ranked_docs, duration = fagins_topk(query, 10, dict_struct, dict_list)
+    display_result_query(ranked_docs)
+    print("size of result:", len(ranked_docs))
+    print("time spent:", duration)
+
+
 if __name__ == "__main__":
     json_path = configuration.get_json_path()
 
@@ -210,16 +227,14 @@ if __name__ == "__main__":
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
 
+    while True:
+        print("-------------- ASKING A QUERY TO THE USER ------------------")
+        ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
+            else False
+        if not ask_again:
+            print("Fine, have a nice day!")
+            break
+        ask_query()
 
-    query = generate_query(True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
-    print("Your query is : " + query)
-    opt = -117
-    while opt not in [0,1]:
-        opt = int(input("Do you wanna use naive or fagin's algorithm? Naive:0, Fagin's:1\n"))
-    if opt == 0:
-        ranked_docs, duration = naive(query, dict_struct)
-    else:
-        ranked_docs, duration = fagins_topk(query, 10, dict_struct, dict_list)
-    display_result_query(ranked_docs)
-    print("size of result:", len(ranked_docs))
-    print("time spent:", duration)
+
+
