@@ -123,23 +123,24 @@ if __name__ == "__main__":
             "Should we export the result dictionary with dictionaries in a json? (yes/anything else) \n")
     if export_json == "yes":
         json_dict = json.dumps(inverted_dictionary)
-        f = open("resources/dict_with_dict.json", "w")
+        f = open(configuration.default_json_path + "/dict_with_dict.json", "w")
         f.write(json_dict)
         f.close()
-        print("Saved in resources/dict_with_dict.json!")
+        print("Saved in " + configuration.default_json_path + "/dict_with_dict.json!")
     export_json = input(
-            "Should we export the result dictionary with lists in a json? (yes/anything else) \n")
+        "Should we export the result dictionary with lists in a json? (yes/anything else) \n")
     if export_json == "yes":
         json_list = json.dumps(inverted_list)
-        f = open("resources/dict_with_list.json", "w")
+        f = open(configuration.default_json_path + "/dict_with_list.json", "w")
         f.write(json_list)
         f.close()
-        print("Saved in resources/dict_with_list.json!")
+        print("Saved in " + configuration.default_json_path + "/dict_with_list.json!")
     export_json = input(
-            "Should we export the corpus dictionary in a json file? (yes/anything else) \n")
+        "Should we export the corpus dictionary in a json file? (yes/anything else) \n")
     if export_json == "yes":
         json_list = json.dumps(corpus_by_doc_id)
-        f = open("resources/corpus_by_doc_id.json", "w")
+        f = open(configuration.default_json_path + "/corpus_by_doc_id.json", "w")
         f.write(json_list)
         f.close()
-        print("Saved in resources/corpus_by_doc_id.json! Have a nice day!")
+        print("Saved in " + configuration.default_json_path + "/corpus_by_doc_id.json! Have a nice day!")
+
