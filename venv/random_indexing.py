@@ -39,12 +39,22 @@ def find_similar_vectors(terms_of_query, context_vectors, n_neighbors=5):
     :param n_neighbors: (int) the number of terms to send back (default=5)
     :return:
     """
+    start_time = time.time()
     neigh = NearestNeighbors(n_neighbors=n_neighbors)
-    samples = list(context_vectors.values())
-    neigh.fit(samples)
+    neigh.fit(list(context_vectors.values()))
+    print("time spent to train KNN:", time.time() - start_time)
     context_vectors_for_specific_terms = [context_vectors[term] for term in terms_of_query]
+    print("time spent to get the context vectors for specific terms:", time.time() - start_time)
     indexes = neigh.kneighbors(context_vectors_for_specific_terms, return_distance=False)
+    print("time spent to find similar context_vectors:", time.time() - start_time)
+    terms = list(context_vectors.keys())
+    print("time spent to convert the values as list terms:", time.time() - start_time)
     print(indexes)
+    for indexes_for_one_term in indexes:
+        for index in indexes_for_one_term:
+            print(index)
+            print("term:", terms[index])
+    print("time spent final:", time.time() - start_time)
 
 
 def generate_index_vector(dimension_vector, nb_non_nulls):
@@ -75,6 +85,10 @@ if __name__ == "__main__":
     startTime = time.time()
     index_vectors, context_vectors = build_index_and_context_vectors(inverted_file_dict)
     print("time spent:", time.time() - startTime)
-    query = ["test", "like"]
-    find_similar_vectors(query, context_vectors)
+
+    while input("Do you want to find similar terms ? (yes/no)\n").lower() == "yes":
+        query = input("Tap a list of terms ? (separated by 'and')\n").lower()
+        terms = list(set(query.split(" and ")))
+        print("Your terms are:", terms)
+        find_similar_vectors(terms, context_vectors)
 
