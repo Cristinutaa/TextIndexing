@@ -82,8 +82,17 @@ class MergedBased:
 
         all_fichier.close()
 
-    def idf(self , n ,  number_docs):
-        return round(  n/number_docs , 2)
+    #def idf(self , n ,  number_docs):
+    #    return round(  n/number_docs , 2)
+
+    # Gives the score for a term with regards to a document
+    # n : Frequency of the term in the document
+    # d : Number of documents that contain the term
+    def tf_idf(n, d):
+        score = 0
+        if n > 0:
+            score = (1 + math.log(n)) * math.log(nb_documents / (1 + d))
+        return score
 
     def calculate_scores(self , record):
 
@@ -103,7 +112,7 @@ class MergedBased:
         for i in range( 0 , number_docs ):
             new_record +=  scores[i].split(':')[0] + ":"
 
-            score_element = self.idf( int(scores[i].split(':')[1]) , number_docs  )
+            score_element = tf_idf( int(scores[i].split(':')[1]) , number_docs  )
 
             new_record += str( score_element ) + ";"
 

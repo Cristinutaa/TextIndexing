@@ -99,16 +99,6 @@ def get_dictionaries(path):
     return inverted_dictionary, inverted_list, nb_documents
 
 
-# Gives the score for a term with regards to a document
-# n : Frequency of the term in the document
-# d : Number of documents that contain the term
-def tf_idf(n, d):
-    score = 0
-    if n > 0:
-        score = (1 + math.log(n)) * math.log(nb_documents / (1 + d))
-    return score
-
-
 if __name__ == "__main__":
     data_path = configuration.get_row_data_path()
     startTime = time.time()
