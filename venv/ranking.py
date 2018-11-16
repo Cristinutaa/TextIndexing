@@ -58,13 +58,12 @@ def naive(query, dict_struct):
     :return: list of ranked docs id and time spent to process the request 
     """
     startTime = time.time()
-    #ps = PorterStemmer()
     docs_score = {}
     query_words = prepare_query(query)
     # We remove the query terms that are not in dict_struct
     query_words = remove_nonexisting_terms(query_words, dict_struct)
     for qt in query_words:
-        #qt = ps.stem(qt) # finally, we stem the word
+        # print("final word:", qt)
         # We have to check if at least one doc contains the qt
         for doc in dict_struct[qt].keys():
             if doc in docs_score:
@@ -168,11 +167,15 @@ def prepare_query(query):
     :param query: the query in string to convert into a list of "conjuncted" words/terms
     :return: a set of query terms
     """
+    ps = PorterStemmer()  # if configuration True, it is used, otherwise not.
     query_words = query.split(" OR ")
     query_words = list(set(query_words))  # only keeps unique words
     for i in range(len(query_words)):
         query_words[i] = query_words[i].lower()
         query_words[i] = query_words[i].strip()
+        if configuration.stemming:
+            query_words[i] = ps.stem(query_words[i]) # finally, we stem the word
+    print("query words:", query_words)
     return query_words
 
 
@@ -187,6 +190,23 @@ def remove_nonexisting_terms(qts, dict_struct):
         if qt not in dict_struct:
             newqts.remove(qt)
     return newqts
+
+
+def ask_query():
+    """A function to represent the process of asking queries to user"""
+    query = generate_query(
+        True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
+    print("Your query is : " + query)
+    opt = -117
+    while opt not in [0, 1]:
+        opt = int(input("Do you want to use naive or fagin's algorithm? Naive:0, Fagin's:1\n"))
+    if opt == 0:
+        ranked_docs, duration = naive(query, dict_struct)
+    else:
+        ranked_docs, duration = fagins_topk(query, 10, dict_struct, dict_list)
+    display_result_query(ranked_docs)
+    print("size of result:", len(ranked_docs))
+    print("time spent:", duration)
 
 
 if __name__ == "__main__":
@@ -207,15 +227,14 @@ if __name__ == "__main__":
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
 
+    while True:
+        print("-------------- ASKING A QUERY TO THE USER ------------------")
+        ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
+            else False
+        if not ask_again:
+            print("Fine, have a nice day!")
+            break
+        ask_query()
 
-    query = generate_query(True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
-    print("Your query is : " + query)
-    opt = -117
-    while opt not in [0,1]:
-        opt = int(input("Do you wanna use naive or fagin's algorithm? Naive:0, Fagin's:1\n"))
-    if opt == 0:
-        ranked_docs, duration = naive(query, dict_struct)
-    else:
-        ranked_docs, duration = fagins_topk(query, 10, dict_struct, dict_list)
-    display_result_query(ranked_docs)
-    print("time spent:", duration)
+
+

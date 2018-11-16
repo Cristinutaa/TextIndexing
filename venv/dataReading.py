@@ -54,6 +54,7 @@ def treat_text(doc_text):
     punctuation = '!"#$%&\()*+,-./:;<=>?@[\\]^_`{|}~'
     for char in punctuation:
         doc_text = doc_text.replace(char, " ")
+
     doc_text = re.sub(r"(\B')", " ", doc_text, flags=re.M)
     doc_text = re.sub(r"('\B)", " ", doc_text, flags=re.M)
     doc_text = re.sub(r"(\d+\S*)", "<number>", doc_text, flags=re.M)
