@@ -1,10 +1,12 @@
 import os
 import pickle
+import math
 
 class MergedBased:
-    def __init__( self, dir_input , file_output ):
+    def __init__( self, dir_input , file_output , nb_documents):
         self.dir_input = dir_input
         self.file_output = file_output
+        self.nb_documents = nb_documents
         # save the first line of each file
         self.lines = []
 
@@ -82,17 +84,14 @@ class MergedBased:
 
         all_fichier.close()
 
-    #def idf(self , n ,  number_docs):
-    #    return round(  n/number_docs , 2)
-
     # Gives the score for a term with regards to a document
     # n : Frequency of the term in the document
     # d : Number of documents that contain the term
-    def tf_idf(n, d):
+    def tf_idf(self, n, d):
         score = 0
         if n > 0:
-            score = (1 + math.log(n)) * math.log(nb_documents / (1 + d))
-        return score
+            score = (1 + math.log(n)) * math.log(self.nb_documents / (1 + d))
+        return round(score, 2)
 
     def calculate_scores(self , record):
 
@@ -112,7 +111,7 @@ class MergedBased:
         for i in range( 0 , number_docs ):
             new_record +=  scores[i].split(':')[0] + ":"
 
-            score_element = tf_idf( int(scores[i].split(':')[1]) , number_docs  )
+            score_element = self.tf_idf( int(scores[i].split(':')[1]) , number_docs  )
 
             new_record += str( score_element ) + ";"
 
@@ -217,6 +216,6 @@ class MergedBased:
 
 
 #on intialise les fichiers dont notre algorithme de "merge based" va travailler
-mb  = MergedBased( "dossier" , "result/out.txt")
+mb  = MergedBased( "D:\DATA\Documents\INFO\TextIndexing\\file_8" , "result/out.txt", 16000)
 
 print( mb.merge_all_files() )
