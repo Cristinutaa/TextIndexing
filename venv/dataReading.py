@@ -9,6 +9,8 @@ import operator
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
+from MergedBased import MergedBased
+
 #personal imports
 import configuration
 
@@ -123,3 +125,6 @@ if __name__ == "__main__":
     add_folder_inverted_dictionary(data_path)
     print("The treatment took %s seconds" % (time.time() - startTime))
     print("Nombre de documents %d" % nb_documents)
+
+    mb = MergedBased( configuration.get_json_path() , "result/out.txt", nb_documents)
+    print(mb.merge_all_files())
