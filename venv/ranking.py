@@ -5,6 +5,7 @@ import os
 import time
 import random
 from sortedcontainers import SortedDict
+import xml.etree.ElementTree as ET
 
 #personal imports
 import configuration
@@ -13,10 +14,18 @@ import random_indexing
 
 
 dict_struct = dict()
+doc_id_by_file = dict()
 corpus_by_doc_id = dict()
 dict_list = dict()
 context_vectors = dict()
 index_vectors = dict()
+
+
+def display_ranked_docs(ranked_docs):
+    rank = 0
+    for doc_id in ranked_docs:
+        rank = rank + 1
+        print("RANK:" + str(rank) + " - DOC_ID:" + str(doc_id))
 
 
 def display_result_query(ranked_docs):
@@ -25,17 +34,33 @@ def display_result_query(ranked_docs):
     :return: None -  display text
     """
     print("The result of your query:")
-    rank = 0
-    for doc_id in ranked_docs:
-        rank = rank+1
-        print("RANK:" + str(rank) + " - DOC_ID:"+str(doc_id))
-    display_docs = True if input("Do you want to display the content of the docs? (yes/no)\n").lower() == "yes" else False
-    if display_docs:
-        rank = 0
-        for doc_id in ranked_docs:
-            rank = rank+1
-            print("RANK:" + str(rank) + " - DOC_ID:"+str(doc_id))
-            print(corpus_by_doc_id[doc_id])
+    display_ranked_docs(ranked_docs)
+    while input("Do you want to display the content of one document ? (yes/no)\n").lower() == "yes":
+        try:
+            print("REMINDER : the result of your query:")
+            display_ranked_docs(ranked_docs)
+            doc_id = int(input("What is the id of the document to display ? (ex : 2)\n"))
+            rank = ranked_docs.index(str(doc_id))
+            print("RANK:" + str(rank+1) + " - DOC_ID:" + str(doc_id))
+            display_one_document(str(doc_id))
+        except ValueError:
+            print("The id of the document doesn't belong to the result of your query.")
+
+
+def display_one_document(doc_id):
+    start_time = time.time()
+    path_to_file = doc_id_by_file[doc_id]
+    with open(path_to_file, "r") as my_file:
+        data = "<root>" + my_file.read() + "</root>"
+        root = ET.fromstring(data)
+        for doc in root.findall("DOC"):
+            if doc.find("DOCID").text.split()[0] == doc_id:
+                text = ""
+                for node in doc:
+                    for p in node.findall("P"):
+                        text = text + ' ' + p.text
+                print(text)
+                print("time spent to display the content:", time.time() - start_time)
 
 
 def generate_query(randomly=True):
@@ -208,6 +233,9 @@ if __name__ == "__main__":
         elif file == "corpus_by_doc_id.json":
             file = open(json_path + "\\" + file)
             corpus_by_doc_id = json.load(file)
+        elif file == "doc_id_by_file.json":
+            file = open(json_path + "\\" + file)
+            doc_id_by_file = json.load(file)
         elif file == "index_vectors.json":
             file = open(json_path + "\\" + file)
             index_vectors = json.load(file)
@@ -217,10 +245,11 @@ if __name__ == "__main__":
     print("dict_struct length:", len(dict_struct))
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
+    print("doc_id_by_file length:", len(doc_id_by_file))
 
-    startTime = time.time()
-    index_vectors, context_vectors = random_indexing.build_index_and_context_vectors(dict_struct)
-    print("time spent:", time.time() - startTime)
+    #startTime = time.time()
+    #index_vectors, context_vectors = random_indexing.build_index_and_context_vectors(dict_struct)
+    #print("time spent:", time.time() - startTime)
 
     query = generate_query(True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
     print("Your query is : " + query)

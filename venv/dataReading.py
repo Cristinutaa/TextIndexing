@@ -14,7 +14,7 @@ import configuration
 
 nltk.download('stopwords')
 sw = stopwords.words('english')
-corpus_by_doc_id = dict()
+doc_id_by_file = dict()
 inverted_dictionary = {}
 inverted_list = {}
 nb_documents = 0
@@ -65,7 +65,6 @@ def add_doc_inverted_dictionary(doc, doc_id):
     for node in doc:
         for p in node.findall("P"):
             text = text + ' ' + p.text
-    corpus_by_doc_id[doc_id] = text
     text = treat_text(text)
     words = text.split()
     update_inverted_dictionary(words, doc_id)
@@ -81,6 +80,7 @@ def add_folder_inverted_dictionary(folder):
                 for doc in root.findall("DOC"):
                     nb_documents = nb_documents + 1
                     doc_id = doc.find("DOCID").text.split()[0]
+                    doc_id_by_file[doc_id] = (folder + "\\" + file)
                     add_doc_inverted_dictionary(doc, doc_id)
 
 
@@ -124,10 +124,10 @@ if __name__ == "__main__":
         f.close()
         print("Saved in resources/dict_with_list.json!")
     export_json = input(
-            "Should we export the corpus dictionary in a json file? (yes/anything else) \n")
+            "Should we export the doc_id_by_file in a json file? (yes/anything else) \n")
     if export_json == "yes":
-        json_list = json.dumps(corpus_by_doc_id)
-        f = open("resources/corpus_by_doc_id.json", "w")
+        json_list = json.dumps(doc_id_by_file)
+        f = open("resources/doc_id_by_file.json", "w")
         f.write(json_list)
         f.close()
-        print("Saved in resources/corpus_by_doc_id.json! Have a nice day!")
+        print("Saved in resources/doc_id_by_file.json! Have a nice day!")
