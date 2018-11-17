@@ -220,8 +220,12 @@ def fagins_ta(query, K, dict_struct, dict_list, epsilon=None):
     firster_for_at_least_one_doc = []  # the list of qts whose loop for which we compute at least one mu_d
     j = 0  # n° of while loop "Repeat until k docs in C [...]"
 
+    criterion = K
+    if epsilon:
+        criterion = tau / (1 + epsilon)
+
     # The big loop
-    while not (len(C.keys()) == K and mu_min >= tau) and len(finish_qts) < nb_qts:  # Repeat until k docs in C...
+    while not (len(C.keys()) == criterion and mu_min >= tau) and len(finish_qts) < nb_qts:  # Repeat until k docs in C...
         # ... and minimum score mu is >= tau and the qts lists still have docs to compute
         mu_min, _ = __get_mu_min_d_min__(C)
         # print("mu_min:", mu_min)
@@ -308,7 +312,6 @@ def __next_studied_term_index__(qt_doc_ranking, computed_docs, j):
     try:
         while qt_doc_ranking[next_studied_ind][0] in computed_docs:
             next_studied_ind += 1
-        # print("+1")
     except:  # It happens that the list has no more next doc
         return -1
     return next_studied_ind
@@ -321,6 +324,7 @@ def ask_query():
     print("Your query is : " + query)
     opt = -117
     K = -117
+    epsilon = None
     while opt not in [0, 1, 2]:
         opt = int(input("Do you want to use naive, fagin's or fagin's threshold algorithm? "
                         "Naive:0, Fagin's:1, Fagin's threshold:2 \n"))
@@ -331,7 +335,11 @@ def ask_query():
         ranked_docs, duration = fagins_topk(query, K, dict_struct, dict_list)
     else:
         K = int(input("Please enter K:  "))
-        ranked_docs, duration = fagins_ta(query, K, dict_struct, dict_list)
+        try:
+            epsilon = float(input("Please enter an epsilon (anything that's not a number for not using it): \n"))
+        except:
+            epsilon = None
+        ranked_docs, duration = fagins_ta(query, K, dict_struct, dict_list, epsilon)
     display_result_query(ranked_docs)
     print("size of result:", len(ranked_docs))
     print("time spent:", duration)
