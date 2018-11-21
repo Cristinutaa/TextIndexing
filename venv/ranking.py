@@ -1,19 +1,31 @@
 import json
 from nltk.stem import PorterStemmer
+import numpy as np
 import os
 import sys
 import time
 import random
 from sortedcontainers import SortedDict
+from sklearn.externals import joblib
+import xml.etree.ElementTree as ET
 
 #personal imports
 import configuration
 import dataReading
+import random_indexing
 
 
 dict_struct = dict()
+doc_id_by_file = dict()
 corpus_by_doc_id = dict()
 dict_list = dict()
+
+
+def display_ranked_docs(ranked_docs):
+    rank = 0
+    for doc_id in ranked_docs:
+        rank = rank + 1
+        print("RANK:" + str(rank) + " - DOC_ID:" + str(doc_id))
 
 
 def display_result_query(ranked_docs):
@@ -22,17 +34,33 @@ def display_result_query(ranked_docs):
     :return: None -  display text
     """
     print("The result of your query:")
-    rank = 0
-    for doc_id in ranked_docs:
-        rank = rank+1
-        print("RANK:" + str(rank) + " - DOC_ID:"+str(doc_id))
-    display_docs = True if input("Do you want to display the content of the docs? (yes/no)\n").lower() == "yes" else False
-    if display_docs:
-        rank = 0
-        for doc_id in ranked_docs:
-            rank = rank+1
-            print("RANK:" + str(rank) + " - DOC_ID:"+str(doc_id))
-            print(corpus_by_doc_id[doc_id])
+    display_ranked_docs(ranked_docs)
+    while input("Do you want to display the content of one document ? (yes/no)\n").lower() == "yes":
+        try:
+            print("REMINDER : the result of your query:")
+            display_ranked_docs(ranked_docs)
+            doc_id = int(input("What is the id of the document to display ? (ex : 2)\n"))
+            rank = ranked_docs.index(str(doc_id))
+            print("RANK:" + str(rank+1) + " - DOC_ID:" + str(doc_id))
+            display_one_document(str(doc_id))
+        except ValueError:
+            print("The id of the document doesn't belong to the result of your query.")
+
+
+def display_one_document(doc_id):
+    start_time = time.time()
+    path_to_file = doc_id_by_file[doc_id]
+    with open(path_to_file, "r") as my_file:
+        data = "<root>" + my_file.read() + "</root>"
+        root = ET.fromstring(data)
+        for doc in root.findall("DOC"):
+            if doc.find("DOCID").text.split()[0] == doc_id:
+                text = ""
+                for node in doc:
+                    for p in node.findall("P"):
+                        text = text + ' ' + p.text
+                print(text)
+                print("time spent to display the content:", time.time() - start_time)
 
 
 def generate_query(randomly=True, nb_terms=None):
@@ -174,7 +202,10 @@ def __prepare_query__(query, random=True):
         query_words[i] = query_words[i].strip()
         if configuration.stemming and not random:
             query_words[i] = ps.stem(query_words[i]) # finally, we stem the word
-    print("query words:", query_words)
+    if configuration.random_indexing:
+        _, context_vectors, model = random_indexing.generate_vectors_and_model(configuration.dimension_vector_random_indexing)
+        query_words = random_indexing.find_similar_terms(query_words, context_vectors, model)
+    print("query words :", query_words)
     return query_words
 
 
@@ -358,6 +389,9 @@ def get_structures():
         elif file == "corpus_by_doc_id.json":
             file = open(json_path + "\\" + file)
             corpus_by_doc_id = json.load(file)
+        elif file == "doc_id_by_file.json":
+            file = open(json_path + "\\" + file)
+            doc_id_by_file = json.load(file)
     print("dict_struct length:", len(dict_struct))
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
