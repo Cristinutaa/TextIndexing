@@ -35,20 +35,22 @@ def display_result_query(ranked_docs):
             print(corpus_by_doc_id[doc_id])
 
 
-def generate_query(randomly=True):
+def generate_query(randomly=True, nb_terms=None):
     """
     :param randomly: Default = True. If False, the user will choose the terms of the query.
     :return: String containing a certain number of terms, separated with "OR"
     """
-    if randomly:
+    if randomly and nb_terms:
+        terms = random.sample(dict_struct.keys(), nb_terms)
+        return __prepare_query__(" OR ".join(terms), True)
+    elif randomly:
         nb_terms = random.randint(1, 4)
-        terms = []
-        for i in range(0, nb_terms):
-            terms.append(random.choice(dict_struct.keys()))
-        return " OR ".join(terms)
+        terms = random.sample(dict_struct.keys(), nb_terms)
+        return __prepare_query__(" OR ".join(terms), True)
     else:
         query = input("Please write your query (terms are separated by 'OR')\n")
-        return query.upper()
+        return __prepare_query__(query.upper(), False)
+
 
 
 def naive(query, dict_struct):
@@ -60,9 +62,8 @@ def naive(query, dict_struct):
     """
     startTime = time.time()
     docs_score = {}
-    query_words = __prepare_query__(query)
     # We remove the query terms that are not in dict_struct
-    query_words = __remove_nonexisting_terms__(query_words, dict_struct)
+    query_words = __remove_nonexisting_terms__(query, dict_struct)
     for qt in query_words:
         # print("final word:", qt)
         # We have to check if at least one doc contains the qt
@@ -97,10 +98,9 @@ def fagins_topk(query, K, dict_struct, dict_list):
     startTime = time.time()
     C = {}
     M = {}
-    qts = __prepare_query__(query) # query terms dict_struct
 
     # We remove the query terms that are not in dict_struct
-    qts = __remove_nonexisting_terms__(qts, dict_struct)
+    qts = __remove_nonexisting_terms__(query, dict_struct)
     print("kept qts:", qts)
 
     # We get the lists of pairs [docid, count of qt in doc] for the query terms
@@ -161,7 +161,7 @@ def fagins_topk(query, K, dict_struct, dict_list):
     return ranked_docs, timespent
 
 
-def __prepare_query__(query):
+def __prepare_query__(query, random=True):
     """
     :param query: the query in string to convert into a list of "conjuncted" words/terms
     :return: a set of query terms
@@ -172,7 +172,7 @@ def __prepare_query__(query):
     for i in range(len(query_words)):
         query_words[i] = query_words[i].lower()
         query_words[i] = query_words[i].strip()
-        if configuration.stemming:
+        if configuration.stemming and not random:
             query_words[i] = ps.stem(query_words[i]) # finally, we stem the word
     print("query words:", query_words)
     return query_words
@@ -206,8 +206,7 @@ def fagins_ta(query, K, dict_struct, dict_list, epsilon=None):
     - When the next doc is the first doc (so when the qt list has not been reached yet)
     """
     #
-    qts = __prepare_query__(query)  # query terms
-    qts = __remove_nonexisting_terms__(qts, dict_struct)  # We remove the query terms that are not in dict_struct
+    qts = __remove_nonexisting_terms__(query, dict_struct)  # We remove the query terms that are not in dict_struct
     nb_qts = len(qts)
     finish_qts = set([])  # qts whose list is entirely browsed
 
@@ -321,7 +320,7 @@ def ask_query():
     """A function to represent the process of asking queries to user"""
     query = generate_query(
         True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
-    print("Your query is : " + query)
+    #print("Your query is : " + query)
     opt = -117
     K = -117
     epsilon = None
@@ -345,7 +344,7 @@ def ask_query():
     print("time spent:", duration)
 
 
-if __name__ == "__main__":
+def get_structures():
     json_path = configuration.get_json_path()
 
     for file in os.listdir(json_path):
@@ -362,7 +361,11 @@ if __name__ == "__main__":
     print("dict_struct length:", len(dict_struct))
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
+    return dict_struct, dict_list, corpus_by_doc_id
 
+
+if __name__ == "__main__":
+    dict_struct, dict_list, corpus_by_doc_id = get_structures()
     while True:
         print("-------------- ASKING A QUERY TO THE USER ------------------")
         ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
