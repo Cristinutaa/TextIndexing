@@ -11,18 +11,16 @@ import time
 #personal imports
 import configuration
 
-index_vectors = dict()
-context_vectors = dict()
-model = []
 
-
-def build_index_and_context_vectors(inverted_dictionary, dimension_vector=100, nb_non_nulls=4):
+def build_index_and_context_vectors(inverted_dictionary, dimension_vector, nb_non_nulls=4):
     """
     :param inverted_dictionary: IF
     :param dimension_vector: (int) the dimension for the index and context vectors (default=100)
     :param nb_non_nulls: (int) the number of non null elements inside an index vector (default=4)
     :return: (tuple) one dictionary (key=doc_id, value=index_vector) & one dictionary (key=term, value=context_vector)
     """
+    index_vectors = dict()
+    context_vectors = dict()
     for term, pl in inverted_dictionary.items():
         context_vectors[term] = np.zeros(dimension_vector, dtype=int)
         for doc_id in pl.keys():
@@ -37,6 +35,11 @@ def build_index_and_context_vectors(inverted_dictionary, dimension_vector=100, n
 
 
 def check_terms_exist(terms_to_check, context_vectors):
+    """
+    :param terms_to_check: (list of string) one string represents one term of the query
+    :param context_vectors: one dictionary (key=term, value=context_vector)
+    :return: (list of string) a sublist of terms_to_check (some words don't belong to the corpus)
+    """
     existing_terms = []
     for term_to_check in terms_to_check:
         if term_to_check in context_vectors.keys():
@@ -46,21 +49,26 @@ def check_terms_exist(terms_to_check, context_vectors):
     return existing_terms
 
 
-def find_similar_vectors(terms_of_query, context_vectors, model):
+def find_similar_terms(terms_of_query, context_vectors, model):
     """
     :param terms_of_query: (list of strings)
     :param context_vectors: one dictionary (key=term, value=context_vector)
     :param model: the KNN model already trained
-    :return:
+    :return: (list of string) represents the terms of the query and the similar terms
     """
     start_time = time.time()
     context_vectors_for_specific_terms = [context_vectors[term] for term in terms_of_query]
-    indexes = model.kneighbors(context_vectors_for_specific_terms, return_distance=False)
+    _, indexes = model.kneighbors(context_vectors_for_specific_terms, return_distance=True)
     terms = list(context_vectors.keys())
+    similar_terms = []
     for i, term_of_query in enumerate(terms_of_query):
-        for index in indexes[i]:
-            print("term:", term_of_query, "- similar term:", terms[index])
-    print("time spent:", time.time() - start_time)
+        result_for_term = "term: " + term_of_query + " - similar terms: "
+        for j, index in enumerate(indexes[i]):
+            result_for_term += terms[index] + " / "
+            similar_terms.append(terms[index])
+        #print(result_for_term)
+    #print("time spent:", time.time() - start_time)
+    return similar_terms
 
 
 def generate_index_vector(dimension_vector, nb_non_nulls):
@@ -76,6 +84,41 @@ def generate_index_vector(dimension_vector, nb_non_nulls):
     return index_vector
 
 
+def generate_vectors_and_model(dimension_vector=100):
+    index_vectors = dict()
+    context_vectors = dict()
+    model = []
+    json_path = configuration.get_json_path()
+    for file in os.listdir(json_path):
+        if file == "dict_with_dict.json":
+            file = open(json_path + "\\" + file)
+            inverted_file_dict = json.load(file)
+            inverted_file_dict = SortedDict(inverted_file_dict)
+        elif file == "model_random_indexing.joblib":
+            file = json_path + "\\" + file
+            model = joblib.load(file)
+        elif file == "index_vectors.joblib":
+            file = json_path + "\\" + file
+            index_vectors = joblib.load(file)
+        elif file == "context_vectors.joblib":
+            file = json_path + "\\" + file
+            context_vectors = joblib.load(file)
+
+    generate_new_model = False
+    if not(index_vectors) or not(context_vectors) or len(list(context_vectors.values())[0])!=dimension_vector:
+        generate_new_model = True
+        start_time = time.time()
+        index_vectors, context_vectors = build_index_and_context_vectors(inverted_file_dict, dimension_vector)
+        #print("time spent to build vectors:", time.time() - start_time)
+
+    if not (model) or generate_new_model:
+        start_time = time.time()
+        model = train_clustering_algorithm(context_vectors)
+        #print("time spent to train the model:", time.time() - start_time)
+
+    return index_vectors, context_vectors, model
+
+
 def train_clustering_algorithm(context_vectors, n_neighbors=5):
     """
     :param context_vectors: one dictionary (key=term, value=context_vector)
@@ -89,41 +132,11 @@ def train_clustering_algorithm(context_vectors, n_neighbors=5):
 
 
 if __name__ == "__main__":
-    json_path = configuration.get_json_path()
-    for file in os.listdir(json_path):
-        if file == "dict_with_dict.json":
-            file = open(json_path + "\\" + file)
-            inverted_file_dict = json.load(file)
-            inverted_file_dict = SortedDict(inverted_file_dict)
-        elif file == "dict_with_list.json":
-            file = open(json_path + "\\" + file)
-            inverted_file_list = json.load(file)
-        elif file == "model_random_indexing.joblib":
-            file = json_path + "\\" + file
-            model = joblib.load(file)
-        elif file == "index_vectors.joblib":
-            file = json_path + "\\" + file
-            index_vectors = joblib.load(file)
-        elif file == "context_vectors.joblib":
-            file = json_path + "\\" + file
-            context_vectors = joblib.load(file)
-    print("inverted_file_dict length:", len(inverted_file_dict))
-
-    generate_new_model = False
-    if not(index_vectors) or not(context_vectors):
-        generate_new_model = True
-        startTime = time.time()
-        index_vectors, context_vectors = build_index_and_context_vectors(inverted_file_dict)
-        print("time spent to build vectors:", time.time() - startTime)
-
-    if not(model) or generate_new_model:
-        startTime = time.time()
-        model = train_clustering_algorithm(context_vectors)
-        print("time spent to train the model:", time.time() - startTime)
+    index_vectors, context_vectors, model = generate_vectors_and_model()
 
     while input("Do you want to find similar terms ? (yes/no)\n").lower() == "yes":
         query = input("Tap a list of terms ? (separated by 'and')\n").lower()
         terms = check_terms_exist(list(set(query.split(" and "))), context_vectors)
         print("Your terms are:", terms)
-        find_similar_vectors(terms, context_vectors, model)
+        print(find_similar_terms(terms, context_vectors, model))
 

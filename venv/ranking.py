@@ -5,6 +5,7 @@ import os
 import time
 import random
 from sortedcontainers import SortedDict
+from sklearn.externals import joblib
 import xml.etree.ElementTree as ET
 
 #personal imports
@@ -17,8 +18,6 @@ dict_struct = dict()
 doc_id_by_file = dict()
 corpus_by_doc_id = dict()
 dict_list = dict()
-context_vectors = dict()
-index_vectors = dict()
 
 
 def display_ranked_docs(ranked_docs):
@@ -202,7 +201,10 @@ def prepare_query(query):
     for i in range(len(query_words)):
         query_words[i] = query_words[i].lower()
         query_words[i] = query_words[i].strip()
-    #random_indexing.find_similar_vectors(query_words, context_vectors)
+    if configuration.random_indexing:
+        _, context_vectors, model = random_indexing.generate_vectors_and_model(configuration.dimension_vector_random_indexing)
+        query_words = random_indexing.find_similar_terms(query_words, context_vectors, model)
+    print("query words :", query_words)
     return query_words
 
 
@@ -236,20 +238,10 @@ if __name__ == "__main__":
         elif file == "doc_id_by_file.json":
             file = open(json_path + "\\" + file)
             doc_id_by_file = json.load(file)
-        elif file == "index_vectors.json":
-            file = open(json_path + "\\" + file)
-            index_vectors = json.load(file)
-        elif file == "context_vectors.json":
-            file = open(json_path + "\\" + file)
-            context_vectors = json.load(file)
     print("dict_struct length:", len(dict_struct))
     print("dict_list length:", len(dict_list))
     print("corpus_by_doc_id length:", len(corpus_by_doc_id))
     print("doc_id_by_file length:", len(doc_id_by_file))
-
-    #startTime = time.time()
-    #index_vectors, context_vectors = random_indexing.build_index_and_context_vectors(dict_struct)
-    #print("time spent:", time.time() - startTime)
 
     query = generate_query(True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
     print("Your query is : " + query)

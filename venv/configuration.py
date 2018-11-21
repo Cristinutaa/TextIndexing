@@ -1,4 +1,6 @@
 stemming = False
+random_indexing = False
+dimension_vector_random_indexing = 100
 default = True
 default_row_data_path = r'F:\laela\Desktop\latimes\latimes'
 default_json_path = r'.\resources'
