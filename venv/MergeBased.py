@@ -3,7 +3,7 @@ import pickle
 import math
 
 
-class MergedBased:
+class MergeBased:
     def __init__( self, dir_input , file_output_binary , nb_documents):
         self.dir_input = dir_input
         self.file_output_binary = file_output_binary
@@ -245,7 +245,7 @@ class MergedBased:
 
 
 #on intialise les fichiers dont notre algorithme de "merge based" va travailler
-#mb  = MergedBased( "dossier_files" , "name_binary_file" , nb_docs)
+#mb  = MergeBased( "dossier_files" , "name_binary_file" , nb_docs)
 
 #print( mb.merge_all_files() )
 
