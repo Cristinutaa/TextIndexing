@@ -5,6 +5,7 @@ import sys
 import time
 import random
 from sortedcontainers import SortedDict
+import operator 
 
 #personal imports
 import configuration
@@ -314,6 +315,20 @@ def __next_studied_term_index__(qt_doc_ranking, computed_docs, j):
     except:  # It happens that the list has no more next doc
         return -1
     return next_studied_ind
+
+
+def __word_dict_2_word_list__(word_dict):
+    """
+    Convert a value of dict_struct to the associated value of dict_list
+    :param word_dict: a dict of pairs docid-word_score
+    :return: a list where pairs docid-word_score are sorted by word_score
+    """
+    word_list = []
+    for d, sc in word_dict.items():
+        word_list.append([d, sc])
+    word_list.sort(key=operator.itemgetter(1))
+    word_list.reverse()
+    return word_list
 
 
 def ask_query():
