@@ -2,7 +2,7 @@ import os
 import pickle
 import math
 
-class MergedBased:
+class MergeBased:
     def __init__( self, dir_input , file_output , nb_documents):
         self.dir_input = dir_input
         self.file_output = file_output
@@ -216,6 +216,6 @@ class MergedBased:
 
 
 #on intialise les fichiers dont notre algorithme de "merge based" va travailler
-mb  = MergedBased( "D:\DATA\Documents\INFO\TextIndexing\\file_8" , "result/out.txt", 16000)
+mb  = MergeBased( "D:\DATA\Documents\INFO\TextIndexing\\file_8" , "result/out.txt", 16000)
 
 print( mb.merge_all_files() )
