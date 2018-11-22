@@ -2,8 +2,8 @@ stemming = False
 random_indexing = False
 dimension_vector_random_indexing = 100
 default = True
-default_row_data_path = r'C:\Users\Cristina\IndexingText\latimes'
-default_json_path = r'.\resources'
+default_row_data_path = r'F:\Ecole\Insa-5e_annee\Indexing\dataset\latimes'
+default_json_path = r'F:\Ecole\Insa-5e_annee\Indexing\bigjsons'
 
 
 def get_row_data_path():
