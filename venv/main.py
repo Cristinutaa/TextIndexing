@@ -27,6 +27,7 @@ def main():
 
     # DATA READING
     print("\n\n--------------- Reading the data from", data_path, "-----------------")
+    print("Please wait until the data have been treated...")
     startTime = time.time()
     dataReading.add_folder_inverted_dictionary(data_path)
     dataReading.create_inverted_list()
@@ -57,17 +58,17 @@ def main():
         "Should we export the corpus dictionary in a json file (to " +
         json_path + ")? (yes/anything else) \n")
     if export_json == "yes":
-        json_list = json.dumps(dataReading.corpus_by_doc_id)
-        f = open(configuration.default_json_path + "/corpus_by_doc_id.json", "w")
+        json_list = json.dumps(dataReading.doc_id_by_file)
+        f = open(configuration.default_json_path + "/doc_id_by_file.json", "w")
         f.write(json_list)
         f.close()
-        print("Saved in " + configuration.default_json_path + "/corpus_by_doc_id.json! Have a nice day!")
+        print("Saved in " + configuration.default_json_path + "/doc_id_by_file.json! Have a nice day!")
 
     # QUERYING : Contrarily to the independent module, we can directly use the value we got earlier7
     # Query as much as you need
     print("\n\n--------------- Querying -----------------")
-    ranking.dict_struct, ranking.dict_list, ranking.corpus_by_doc_id = \
-        dataReading.inverted_dictionary, dataReading.inverted_list, dataReading.corpus_by_doc_id
+    ranking.dict_struct, ranking.dict_list, ranking.doc_id_by_file = \
+        dataReading.inverted_dictionary, dataReading.inverted_list, dataReading.doc_id_by_file
     while True:
         ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
             else False

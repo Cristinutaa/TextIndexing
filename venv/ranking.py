@@ -18,7 +18,7 @@ import random_indexing
 
 dict_struct = dict()
 doc_id_by_file = dict()
-corpus_by_doc_id = dict()
+doc_id_by_file = dict()
 dict_list = dict()
 
 
@@ -415,20 +415,20 @@ def get_structures():
         elif file == "dict_with_list.json":
             file = open(json_path + "\\" + file)
             dict_list = json.load(file)
-        elif file == "corpus_by_doc_id.json":
+        elif file == "doc_id_by_file.json":
             file = open(json_path + "\\" + file)
-            corpus_by_doc_id = json.load(file)
+            doc_id_by_file = json.load(file)
         elif file == "doc_id_by_file.json":
             file = open(json_path + "\\" + file)
             doc_id_by_file = json.load(file)
     print("dict_struct length:", len(dict_struct))
     print("dict_list length:", len(dict_list))
-    print("corpus_by_doc_id length:", len(corpus_by_doc_id))
-    return dict_struct, dict_list, corpus_by_doc_id
+    print("doc_id_by_file length:", len(doc_id_by_file))
+    return dict_struct, dict_list, doc_id_by_file
 
 
 if __name__ == "__main__":
-    dict_struct, dict_list, corpus_by_doc_id = get_structures()
+    dict_struct, dict_list, doc_id_by_file = get_structures()
     while True:
         print("-------------- ASKING A QUERY TO THE USER ------------------")
         ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
