@@ -11,8 +11,7 @@ import xml.etree.ElementTree as ET
 import operator
 
 #personal imports
-import configuration
-import dataReading
+from configuration import Configuration
 import random_indexing
 
 
@@ -93,6 +92,8 @@ def naive(query, dict_struct):
     docs_score = {}
     # We remove the query terms that are not in dict_struct
     query_words = __remove_nonexisting_terms__(query, dict_struct)
+    if len(query_words) == 0:
+        return [], time.time() - startTime
     for qt in query_words:
         # print("final word:", qt)
         # We have to check if at least one doc contains the qt
@@ -131,6 +132,8 @@ def fagins_topk(query, K, dict_struct, dict_list):
     # We remove the query terms that are not in dict_struct
     qts = __remove_nonexisting_terms__(query, dict_struct)
     print("kept qts:", qts)
+    if len(qts) == 0:
+        return [], time.time() - startTime
 
     # We get the lists of pairs [docid, count of qt in doc] for the query terms
     qtdoc_ranking = [] # each element = a list of pairs [docid, count of qt in doc] for respective qt, sorted by score
@@ -186,6 +189,8 @@ def fagins_topk(query, K, dict_struct, dict_list):
     ranked_docs = []
     for pair in reversed(scores_list):  # scores must be in decreasing order
         ranked_docs.append(pair[1])
+        if len(ranked_docs) == K:
+            break
     timespent = time.time() - startTime
     return ranked_docs, timespent
 
@@ -195,16 +200,17 @@ def __prepare_query__(query, random=True):
     :param query: the query in string to convert into a list of "conjuncted" words/terms
     :return: a set of query terms
     """
-    ps = PorterStemmer()  # if configuration True, it is used, otherwise not.
+    ps = PorterStemmer()  # if Configuration.stemming True, it is used, otherwise not.
     query_words = query.split(" OR ")
     query_words = list(set(query_words))  # only keeps unique words
     for i in range(len(query_words)):
         query_words[i] = query_words[i].lower()
         query_words[i] = query_words[i].strip()
-        if configuration.stemming and not random:
+        if Configuration.stemming and not random:
             query_words[i] = ps.stem(query_words[i]) # finally, we stem the word
-    if configuration.random_indexing:
-        _, context_vectors, model = random_indexing.generate_vectors_and_model(configuration.dimension_vector_random_indexing)
+    if Configuration.random_indexing:
+        _, context_vectors, model = \
+            random_indexing.generate_vectors_and_model(Configuration.dimension_vector_random_indexing)
         query_words = random_indexing.find_similar_terms(query_words, context_vectors, model)
     print("query words :", query_words)
     return query_words
@@ -239,11 +245,14 @@ def fagins_ta(query, K, dict_struct, dict_list, epsilon=None):
     """
     #
     qts = __remove_nonexisting_terms__(query, dict_struct)  # We remove the query terms that are not in dict_struct
+    startTime = time.time()
+    if len(qts) == 0:
+        return [], time.time() - startTime
     nb_qts = len(qts)
     finish_qts = set([])  # qts whose list is entirely browsed
 
     # Variables' initialization: from algorithm and also intermediary variables
-    startTime = time.time()
+
     C = {}  # a dict whose keys are docs d, values are mu(d). It also contains docs whose mu has been computed
     computed_docs = []  # docs whose score has been computed. Not all are in C : those that have been removed.
     tau = sys.maxsize
@@ -405,19 +414,18 @@ def ask_query():
 
 
 def get_structures():
-    json_path = configuration.get_json_path()
+    """
+    :return: the structures from the path to folder containing the jsons
+    """
+    json_path = Configuration.json_path
 
     for file in os.listdir(json_path):
         if file == "dict_with_dict.json":
             file = open(json_path + "\\" + file)
             dict_struct = json.load(file)
-            dict_struct = SortedDict(dict_struct)
         elif file == "dict_with_list.json":
             file = open(json_path + "\\" + file)
             dict_list = json.load(file)
-        elif file == "doc_id_by_file.json":
-            file = open(json_path + "\\" + file)
-            doc_id_by_file = json.load(file)
         elif file == "doc_id_by_file.json":
             file = open(json_path + "\\" + file)
             doc_id_by_file = json.load(file)

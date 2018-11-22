@@ -9,7 +9,7 @@ from sortedcontainers import SortedDict
 import time
 
 #personal imports
-import configuration
+from configuration import Configuration
 
 
 def build_index_and_context_vectors(inverted_dictionary, dimension_vector, nb_non_nulls=4):
@@ -88,7 +88,7 @@ def generate_vectors_and_model(dimension_vector=100):
     index_vectors = dict()
     context_vectors = dict()
     model = []
-    json_path = configuration.get_json_path()
+    json_path = Configuration.json_path
     for file in os.listdir(json_path):
         if file == "dict_with_dict.json":
             file = open(json_path + "\\" + file)

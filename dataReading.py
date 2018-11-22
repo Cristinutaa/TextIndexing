@@ -10,7 +10,7 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
 # personal imports
-import configuration
+from configuration import Configuration
 
 nltk.download('stopwords')
 sw = stopwords.words('english')
@@ -23,7 +23,7 @@ nb_documents = 0
 def update_inverted_dictionary(array, doc_id):
     global inverted_dictionary
     global inverted_list
-    if configuration.stemming:
+    if Configuration.stemming:
         ps = PorterStemmer()
         for word in array:
             item = ps.stem(word)
@@ -100,7 +100,7 @@ def get_dictionaries(path):
 
 
 if __name__ == "__main__":
-    data_path = configuration.get_row_data_path()
+    data_path = Configuration.row_data_path
     startTime = time.time()
     add_folder_inverted_dictionary(data_path)
     create_inverted_list()
@@ -113,18 +113,18 @@ if __name__ == "__main__":
             "Should we export the result dictionary with dictionaries in a json? (yes/anything else) \n")
     if export_json == "yes":
         json_dict = json.dumps(inverted_dictionary)
-        f = open(configuration.default_json_path + "/dict_with_dict.json", "w")
+        f = open(Configuration.json_path + "/dict_with_dict.json", "w")
         f.write(json_dict)
         f.close()
-        print("Saved in " + configuration.default_json_path + "/dict_with_dict.json!")
+        print("Saved in " + Configuration.json_path + "/dict_with_dict.json!")
     export_json = input(
         "Should we export the result dictionary with lists in a json? (yes/anything else) \n")
     if export_json == "yes":
         json_list = json.dumps(inverted_list)
-        f = open(configuration.default_json_path + "/dict_with_list.json", "w")
+        f = open(Configuration.json_path + "/dict_with_list.json", "w")
         f.write(json_list)
         f.close()
-        print("Saved in " + configuration.default_json_path + "/dict_with_list.json!")
+        print("Saved in " + Configuration.json_path + "/dict_with_list.json!")
     export_json = input(
             "Should we export the doc_id_by_file in a json file? (yes/anything else) \n")
     if export_json == "yes":
