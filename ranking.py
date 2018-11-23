@@ -138,7 +138,7 @@ def fagins_topk(query, K, dict_struct, dict_list):
     # We get the lists of pairs [docid, count of qt in doc] for the query terms
     qtdoc_ranking = [] # each element = a list of pairs [docid, count of qt in doc] for respective qt, sorted by score
     qtdoc_nb = [] # number of docs for each query term that are in C
-    print("qts now:", qts)
+    # print("qts now:", qts)
     for qt in qts:
         qtdoc_ranking.append(dict_list[qt])
         qtdoc_nb.append(len(dict_list[qt]))
@@ -260,12 +260,12 @@ def fagins_ta(query, K, dict_struct, dict_list, epsilon=None):
     firster_for_at_least_one_doc = []  # the list of qts whose loop for which we compute at least one mu_d
     j = 0  # n° of while loop "Repeat until k docs in C [...]"
 
-    criterion = K
+    criterion = tau
     if epsilon:
         criterion = tau / (1 + epsilon)
 
     # The big loop
-    while not (len(C.keys()) == criterion and mu_min >= tau) and len(finish_qts) < nb_qts:  # Repeat until k docs in C...
+    while not (len(C.keys()) == K and mu_min >= criterion) and len(finish_qts) < nb_qts:  # Repeat until k docs in C...
         # ... and minimum score mu is >= tau and the qts lists still have docs to compute
         mu_min, _ = __get_mu_min_d_min__(C)
         # print("mu_min:", mu_min)
@@ -286,7 +286,7 @@ def fagins_ta(query, K, dict_struct, dict_list, epsilon=None):
                     if len(C) < K:
                         C[d] = mud
                         mu_min, _ = __get_mu_min_d_min__(C)
-                    else:
+                    elif mu_min < mud:
                         mu_min, d_min = __get_mu_min_d_min__(
                             C)  # We store the doc from C with the min score as well as the min score for instruction below
                         del C[d_min]
@@ -312,6 +312,10 @@ def fagins_ta(query, K, dict_struct, dict_list, epsilon=None):
                         tau += dict_list[qt][next_studied_qt - 1][1]
                 tau /= nb_qts
                 # print("tau:", tau)
+                if epsilon:
+                    criterion = tau/(1+epsilon)
+                else:
+                    criterion = tau
         mu_min, _ = __get_mu_min_d_min__(C)
         j += 1
 
@@ -371,24 +375,19 @@ def __next_studied_term_index__(qt_doc_ranking, computed_docs, j):
     return next_studied_ind
 
 
-def __word_dict_2_word_list__(word_dict):
-    """
-    Convert a value of dict_struct to the associated value of dict_list
-    :param word_dict: a dict of pairs docid-word_score
-    :return: a list where pairs docid-word_score are sorted by word_score
-    """
-    word_list = []
-    for d, sc in word_dict.items():
-        word_list.append([d, sc])
-    word_list.sort(key=operator.itemgetter(1))
-    word_list.reverse()
-    return word_list
-
-
 def ask_query():
     """A function to represent the process of asking queries to user"""
-    query = generate_query(
-        True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False)
+    q_generation = True if input("Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False
+    nb_terms = None
+    if q_generation:
+        nb_terms = input("Please specify a number of terms (anything else for a number between 1 and 4):    ")
+        try:
+            nb_terms = int(nb_terms)
+            if nb_terms < 1:
+                nb_terms = None
+        except:
+            nb_terms = None
+    query = generate_query(q_generation, nb_terms)
     #print("Your query is : " + query)
     opt = -117
     K = -117
