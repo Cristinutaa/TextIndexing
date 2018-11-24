@@ -30,6 +30,10 @@ class Configuration():
                 Configuration.random_indexing = True
             else:
                 Configuration.random_indexing = False
+            if conf["merge_based"] == "True":
+                Configuration.merge_based = True
+            else:
+                Configuration.merge_based = False
             Configuration.row_data_path = conf["row_data_path"]
             Configuration.json_path = conf["json_path"]
             Configuration.dimension_vector_random_indexing = conf["dimension_vector_random_indexing"]
@@ -56,7 +60,13 @@ class Configuration():
                         print("Invalid entry")
             else:
                 Configuration.random_indexing = False
-            # 3/ Data path
+            # 3/ merge-based or not
+            choice = input("Do you want to use merge-based?  (yes/anything else)")
+            if choice == "yes":
+                Configuration.merge_based = True
+            else:
+                Configuration.merge_based = False
+            # 4/ Data path
             Configuration.row_data_path = input("Please specify path to data : ")
 
 

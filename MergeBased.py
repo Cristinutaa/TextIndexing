@@ -2,10 +2,12 @@ import os
 import pickle
 import math
 
+
 class MergeBased:
-    def __init__( self, dir_input , file_output , nb_documents):
+    def __init__( self, dir_input , file_output_binary , nb_documents):
         self.dir_input = dir_input
-        self.file_output = file_output
+        self.file_output_binary = file_output_binary
+
         self.nb_documents = nb_documents
         # save the first line of each file
         self.lines = []
@@ -17,13 +19,16 @@ class MergeBased:
         self.files_names = os.listdir( self.dir_input )
 
         # file to merge all files
-        self.file_all = open( self.file_output , 'w+')
+        #self.file_all = open( self.file_output , 'w+')
 
         # save the number of files
         self.file_number = len( self.files_names )
 
         # last inserted line
         self.last_inserted_line = ""
+
+        #dictionnaire pour mot offset
+        self.dict = {}
 
         # save all files in a list
         for file_index in range(0, self.file_number):
@@ -60,7 +65,7 @@ class MergeBased:
         for file_index in range(0, self.file_number):
             self.files[file_index].close()
 
-        self.file_all.close()
+       #self.file_all.close()
 
     def getIndiceFileMinLine(self , the_first_line):
         tokens = []
@@ -74,7 +79,7 @@ class MergeBased:
 
         return tokens.index(sorted_lines[0])
 
-    def print_merged_file(self):
+    '''def print_merged_file(self):
         print("-----------------------------------------------------")
         with open(self.file_output, 'r') as all_fichier:
             while True:
@@ -82,7 +87,7 @@ class MergeBased:
                 if ("" == line):
                     break
 
-        all_fichier.close()
+        all_fichier.close()'''
 
     # Gives the score for a term with regards to a document
     # n : Frequency of the term in the document
@@ -121,7 +126,7 @@ class MergeBased:
     def merge_all_files(self):
 
         #declarer le fichier binaire:
-        binary_file = open("out.dat", 'wb')
+        binary_file = open(self.file_output_binary, 'wb')
         mon_pickler = pickle.Pickler(binary_file)
 
         #intialiser notre dictionnaire qui contient mot , offset , lenght
@@ -151,16 +156,15 @@ class MergeBased:
             self.indice_min_line = self.getIndiceFileMinLine( self.the_first_line )
 
             if(self.the_first_line[self.indice_min_line] == "\n"):
-                print("===============> Fin de fichier ************:*:*:*:*:*")
+
                 self.indice_min_line = self.getIndiceFileMinLine(self.the_first_line)
             elif( last_readed_line == "" or last_readed_line == "\n" or last_readed_line == " "):
                 last_readed_line = self.the_first_line[ self.indice_min_line ]
-                #self.the_first_line[self.indice_min_line] = self.files[self.indice_min_line].readline()
+
 
             elif ( self.estLastEqualToInserted( last_readed_line ,  self.the_first_line[self.indice_min_line] ) == True ):
                 last_readed_line = self.merge( last_readed_line, self.the_first_line[self.indice_min_line])
-                # remlir the_first_line table , en ajoutant une nouvelle entrée issue de fichier dans nous avons lu
-                #self.the_first_line[self.indice_min_line] = self.files[self.indice_min_line].readline()
+
             else:
                 last_readed_line = self.calculate_scores( last_readed_line )
 
@@ -170,19 +174,13 @@ class MergeBased:
                 dict[mot]["offset"] = binary_file.tell()
 
 
-                print("dict[mot][offset] : ",dict[mot]["offset"])
-
                 mon_pickler.dump(last_readed_line.split('|')[1])
 
                 dict[mot]["length"] = binary_file.tell()
-                print("dict[mot][length] : ", dict[mot]["length"])
 
                 #/add in binary file
-                self.file_all.write( last_readed_line )
+                #self.file_all.write( last_readed_line )
                 last_readed_line = self.the_first_line[self.indice_min_line]
-                #self.the_first_line[self.indice_min_line] = self.files[self.indice_min_line].readline()
-
-
 
             self.the_first_line[self.indice_min_line] = self.files[self.indice_min_line].readline()
 
@@ -198,24 +196,63 @@ class MergeBased:
                 dict[mot] = {}
                 dict[mot]["offset"] = binary_file.tell()
 
-                print("dict[mot][offset] : ", dict[mot]["offset"])
-
                 mon_pickler.dump(last_readed_line.split('|')[1])
 
                 dict[mot]["length"] = binary_file.tell()
-                print("dict[mot][length] : ", dict[mot]["length"])
                 # /binary file
-                self.file_all.write(last_readed_line)
+                #self.file_all.write(last_readed_line)
 
 
         # fermer tous les fichier
         self.closeFiles()
         binary_file.close()
 
-        return dict
+        self.dict = dict
+        return self.dict
+
+    def getDocsByWord(self , word ):
+        #use to get the offset from dictionnaire
+        offset_word = 0;
+
+        if word in self.dict.keys():
+
+            offset = self.dict[word]["offset"]
+
+            #read from binary file and search the word
+            binary_file = open(self.file_output_binary, 'rb')
+
+            mon_depickler = pickle.Unpickler(binary_file)
+
+            binary_file.seek( offset , os.SEEK_SET )
+
+            WordDocsList = mon_depickler.load()
+
+            #convert string to list
+            dict_docs = {}
+
+            ListDocScore = WordDocsList.split(';')
+
+            number_docs = len(ListDocScore) - 1
+
+            for i in range(0 , number_docs  ):
+                dict_docs[ (ListDocScore[i].split(':'))[0] ] = (ListDocScore[i].split(':'))[1]
+
+            return dict_docs
+
+
+        else:
+            return -1
 
 
 #on intialise les fichiers dont notre algorithme de "merge based" va travailler
-mb  = MergeBased( "D:\DATA\Documents\INFO\TextIndexing\\file_8" , "result/out.txt", 16000)
+#mb  = MergedBased( "dossier" ,"out.dat" , 10000)
 
-print( mb.merge_all_files() )
+#print( mb.merge_all_files() )
+
+#print(mb.getDocsByWord( "a" ))
+
+
+
+
+
+

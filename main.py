@@ -7,6 +7,7 @@ import sys
 import dataReading
 import ranking
 from configuration import Configuration
+from MergeBased import MergeBased
 
 
 def main():
@@ -60,22 +61,35 @@ def main():
                 f.write(json_list)
                 f.close()
                 print("Saved in " + Configuration.json_path + "/doc_id_by_file.json! Have a nice day!")
-            ranking.dict_struct, ranking.dict_list, ranking.doc_id_by_file = \
-                dataReading.inverted_dictionary, dataReading.inverted_list, dataReading.doc_id_by_file
+        dict_struct, dict_list, doc_id_by_file = \
+            dataReading.inverted_dictionary, dataReading.inverted_list, dataReading.doc_id_by_file
     else:
         print("Fine. Fetching json files from " + Configuration.json_path + "...")
-        ranking.dict_struct, ranking.dict_list, ranking.doc_id_by_file = ranking.get_structures()
+        dict_struct, dict_list, doc_id_by_file = dataReading.get_structures()
 
     # QUERYING : Contrarily to the independent module, we can directly use the values we got earlier
     # Query as much as you need
     print("\n\n--------------- Querying -----------------")
+    # 1/ Init a query process
+    if Configuration.merge_based:
+        temp = "./temp_ressources"  # Temporary directory to put blocks of structure
+        if not os.path.exists(temp):
+            os.makedirs(temp)
+        dataReading.delete_folder_files() # We clean the folder to use for the blocks of structure
+        dataReading.add_folder_inverted_dictionary(Configuration.row_data_path) # Save blocks of structure
+        mb = MergeBased(temp, "binary_file_out.txt", dataReading.nb_documents)
+        mb.merge_all_files()
+        query_process = ranking.QueryProcess(doc_id_by_file, merge_based=mb)
+        pass
+    else:
+        query_process = ranking.QueryProcess(doc_id_by_file, dict_struct=dict_struct, dict_list=dict_list)
     while True:
         ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
             else False
         if not ask_again:
             print("Fine, have a nice day!")
             sys.exit()
-        ranking.ask_query()
+        query_process.ask_query()
 
 
 if __name__ == "__main__":
