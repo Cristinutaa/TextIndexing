@@ -245,11 +245,11 @@ class MergedBased:
 
 
 #on intialise les fichiers dont notre algorithme de "merge based" va travailler
-#mb  = MergedBased( "dossier_files" , "name_binary_file" , nb_docs)
+#mb  = MergedBased( "dossier" ,"out.dat" , 10000)
 
 #print( mb.merge_all_files() )
 
-#print(mb.getDocsByWord( "mot cherché" ))
+#print(mb.getDocsByWord( "a" ))
 
 
 
