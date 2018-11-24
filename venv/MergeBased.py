@@ -3,7 +3,7 @@ import pickle
 import math
 
 
-class MergedBased:
+class MergeBased:
     def __init__( self, dir_input , file_output_binary , nb_documents):
         self.dir_input = dir_input
         self.file_output_binary = file_output_binary

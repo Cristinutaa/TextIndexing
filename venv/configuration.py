@@ -1,6 +1,6 @@
 stemming = False
 default = True
-default_row_data_path = r'C:\Users\Cristina\IndexingText\latimes'
+default_row_data_path = r'D:\DATA\Documents\INFO\TextIndexing\latimes'
 default_json_path = r'.\resources'
 
 

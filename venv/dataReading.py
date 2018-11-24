@@ -9,7 +9,7 @@ import operator
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-from MergedBased import MergedBased
+from MergeBased import MergeBased
 
 #personal imports
 import configuration
@@ -126,5 +126,5 @@ if __name__ == "__main__":
     print("The treatment took %s seconds" % (time.time() - startTime))
     print("Nombre de documents %d" % nb_documents)
 
-    mb = MergedBased( configuration.get_json_path() , "result/out.txt", nb_documents)
+    mb = MergeBased( configuration.get_json_path() , "result/out.txt", nb_documents)
     print(mb.merge_all_files())
