@@ -40,15 +40,16 @@ class QueryProcess:
         self.qws = [] # a variable to store list of query words
         self.ranked_docs = []  # top docs of last query
         self.duration = 0  # duration of last query
-        print("A query process has been loaded.")
+        #print("A query process has been loaded.")
 
     def ask_query(self):
         """A function to represent the process of asking queries to user"""
 
-        # 1/ Getting the query terms
+        # 1/ Getting the word queries
         q_generation = True if input(
             "Do you want to randomly generate a query ? (yes/no)\n").lower() == "yes" else False
         nb_terms = None
+        candidate_terms = []  # only used when q_generation = True. In this case, will be filled.
         if q_generation:
             nb_terms = input("Please specify a number of terms (anything else for a number between 1 and 4):    ")
             try:
@@ -57,7 +58,12 @@ class QueryProcess:
                     nb_terms = None
             except:
                 nb_terms = None
-        self.qws = generate_query_terms(q_generation, nb_terms, self.dict_struct.keys()) # self.dict_struct.keys() only works when not merged base TODO
+            if Configuration.merge_based:
+                candidate_terms = self.merge_based.dict.keys()
+                #print("candidate terms for merged_based:",candidate_terms)
+            else:
+                candidate_terms = self.dict_struct.keys()
+        self.qws = generate_query_terms(q_generation, nb_terms, candidate_terms)
         # print("Your query is : " + query)
 
         # 2/ Updating the queryProcess's fields for the ranking algorithm:
@@ -102,19 +108,19 @@ class QueryProcess:
             # We have to check if at least one doc contains the qt
             for doc in self.dict_struct[qt].keys():
                 if doc in docs_score:
-                    docs_score[doc] += self.dict_struct[qt][doc]
+                    docs_score[doc] += float(self.dict_struct[qt][doc])
                 else:
-                    docs_score[doc] = self.dict_struct[qt][doc]
+                    docs_score[doc] = float(self.dict_struct[qt][doc])
 
         scores_list = []  # list of pairs (count,doc_id)
         nwords = len(self.qws)
         for k, v in docs_score.items():
-            scores_list.append((v / nwords, k))
+            scores_list.append((float(v) / nwords, k))
         scores_list.sort()
         """But we only want the ranked document id, not the scores"""
         ranked_docs = []
         for pair in reversed(scores_list):  # scores must be in decreasing order
-            ranked_docs.append(pair[1])
+            ranked_docs.append(pair[1].strip())
         timespent = time.time() - startTime
         self.ranked_docs, self.duration = ranked_docs, timespent
 
@@ -127,7 +133,7 @@ class QueryProcess:
         startTime = time.time()
         C = {}
         M = {}
-        print("kept qts:", self.qws)
+        #print("kept qts:", self.qws)
         if len(self.qws) == 0:
             return [], time.time() - startTime
 
@@ -172,19 +178,19 @@ class QueryProcess:
             C[k] = 0
             for qt in self.qws:  # for each dict of each qt
                 # qt is in dict_struct, according to function __remove_nonexisting_terms__
-                C[k] += self.dict_struct[qt].get(k, 0)
+                C[k] += float(self.dict_struct[qt].get(k, 0))
 
         # We want to get pairs (docscore, docid)
         # Since for now, C is composed of summed score, we will divide by #qts to get the average scores.
         scores_list = []  # list of pairs doc scores, docid)
         nwords = len(self.qws)
         for k, v in C.items():
-            scores_list.append((v / nwords, k))
+            scores_list.append((float(v) / nwords, k))
         scores_list.sort()
         """But we only want the ranked document id, not the scores."""
         ranked_docs = []
         for pair in reversed(scores_list):  # scores must be in decreasing order
-            ranked_docs.append(pair[1])
+            ranked_docs.append(pair[1].strip())
             if len(ranked_docs) == K:
                 break
         timespent = time.time() - startTime
@@ -238,7 +244,7 @@ class QueryProcess:
                             firster_for_at_least_one_doc.append(qt)
                         mud = 0  # random access to all remaining qt to compute the combined score mu(d)
                         for qtrand in self.qws:
-                            mud += self.dict_struct[qtrand].get(d, 0)
+                            mud += float(self.dict_struct[qtrand].get(d, 0))
                         mud /= nb_qts
                         computed_docs.append(d)
                         if len(C) < K:
@@ -267,7 +273,7 @@ class QueryProcess:
                             # the next doc is the first doc, we ignore it
                             finish_qts.add(qt)
                         else:
-                            tau += self.dict_list[qt][next_studied_qt - 1][1]
+                            tau += float(self.dict_list[qt][next_studied_qt - 1][1])
                     tau /= nb_qts
                     # print("tau:", tau)
                     if epsilon:
@@ -285,7 +291,7 @@ class QueryProcess:
         """But we only want the ranked document id, not the scores. And until K elements"""
         ranked_docs = []
         for pair in reversed(scores_list):  # scores must be in decreasing order
-            ranked_docs.append(pair[1])
+            ranked_docs.append(pair[1].strip())
             if len(ranked_docs) == K:
                 break
         timespent = time.time() - startTime
@@ -301,8 +307,13 @@ class QueryProcess:
                 doc_id = int(input("What is the id of the document to display ? (ex : 2)\n"))
                 rank = self.ranked_docs.index(str(doc_id))
                 print("RANK:" + str(rank + 1) + " - DOC_ID:" + str(doc_id))
-                self.__display_one_document__(str(doc_id))
-            except ValueError:
+                try:
+                    self.__display_one_document__(str(doc_id))
+                except:
+                    print("If you are in option merge-based and haven't specified a json_path to a"
+                          " valid doc_id_by_file.json, this feature cannot be used.")
+                    break
+            except :
                 print("The id of the document doesn't belong to the result of your query.")
 
     def __display_ranked_docs__(self):
@@ -339,17 +350,22 @@ class QueryProcess:
     def __fill_structs_from_query_words__(self):
         """Called when we use merge-based. We fill the structures with only the terms of interest.
         Words that are not in our data are discarded.
+        Careful:
+        - scores are strings => in the algorithm, when we get them, they must be converted to float
+        - doc ids can be surrounded with spaces => => in the algorithm, when we get them, they must be trimmed
         """
         self.dict_struct = {}
         self.dict_list = {}
         qws = self.qws.copy()
         for qw in qws:
-            res = self.merge_based.getDocByWord(qw)
+            res = self.merge_based.getDocsByWord(qw)
             if res != -1:
                 self.dict_struct[qw] = res
                 self.dict_list[qw] = word_dict_2_word_list(self.dict_struct[qw])
             else:
                 self.qws.remove(qw)
+        #("dict_struct:", self.dict_struct)
+        #print("dict_list:", self.dict_list)
 
     def __remove_nonexisting_terms__(self):
         """

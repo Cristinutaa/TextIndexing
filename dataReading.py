@@ -111,6 +111,7 @@ def get_dictionaries(path):
 
 
 def save_inverted(number, temp_folder):
+    #print("tmp folder:", temp_folder)
     global inverted_dictionary
     global inverted_list
     for key in inverted_dictionary.keys():
@@ -156,40 +157,3 @@ def get_structures():
     print("dict_list length:", len(dict_list))
     print("doc_id_by_file length:", len(doc_id_by_file))
     return dict_struct, dict_list, doc_id_by_file
-
-
-if __name__ == "__main__":
-    data_path = Configuration.row_data_path
-    startTime = time.time()
-    add_folder_inverted_dictionary(data_path)
-    create_inverted_list()
-    print("The treatment took %s seconds" % (time.time() - startTime))
-    print("Nombre de documents %d" % nb_documents)
-
-    if not os.path.exists("resources"):
-        os.makedirs("resources")
-    export_json = input(
-            "Should we export the result dictionary with dictionaries in a json? (yes/anything else) \n")
-    if export_json == "yes":
-        json_dict = json.dumps(inverted_dictionary)
-        f = open(Configuration.json_path + "/dict_with_dict.json", "w")
-        f.write(json_dict)
-        f.close()
-        print("Saved in " + Configuration.json_path + "/dict_with_dict.json!")
-    export_json = input(
-        "Should we export the result dictionary with lists in a json? (yes/anything else) \n")
-    if export_json == "yes":
-        json_list = json.dumps(inverted_list)
-        f = open(Configuration.json_path + "/dict_with_list.json", "w")
-        f.write(json_list)
-        f.close()
-        print("Saved in " + Configuration.json_path + "/dict_with_list.json!")
-    export_json = input(
-            "Should we export the doc_id_by_file in a json file? (yes/anything else) \n")
-    if export_json == "yes":
-        json_list = json.dumps(doc_id_by_file)
-        f = open("resources/doc_id_by_file.json", "w")
-        f.write(json_list)
-        f.close()
-        print("Saved in resources/doc_id_by_file.json! Have a nice day!")
-

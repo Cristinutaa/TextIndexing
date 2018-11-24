@@ -34,10 +34,10 @@ class Configuration():
                 Configuration.merge_based = True
             else:
                 Configuration.merge_based = False
-            Configuration.row_data_path = conf["row_data_path"]
-            Configuration.json_path = conf["json_path"]
+            Configuration.row_data_path = conf["row_data_path"] # path to data
+            Configuration.json_path = conf["json_path"]  # path where to save or load the json structures and the
+                                                         # doc_id_by_file.
             Configuration.dimension_vector_random_indexing = conf["dimension_vector_random_indexing"]
-
         else:  # Configurations to enter
             # 1/ Stemming or not
             choice = input("Do you want to use stemming?  (yes/anything else)")
@@ -68,6 +68,8 @@ class Configuration():
                 Configuration.merge_based = False
             # 4/ Data path
             Configuration.row_data_path = input("Please specify path to data : ")
+            # 5/ Json path
+            Configuration.json_path = input("Please specify path where to save/load jsons : ")
 
 
 
