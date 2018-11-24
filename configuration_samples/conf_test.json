@@ -1,6 +1,7 @@
 {
     "stemming": "False",
-    "random_indexing" : "True",
+    "random_indexing" : "False",
+    "merge_based" : "False",
     "dimension_vector_random_indexing" : 100,
     "row_data_path": "F:/Ecole/Insa-5e_annee/Indexing/minidataset",
     "json_path" : "F:/Ecole/Insa-5e_annee/Indexing/pdc/tryresources"
