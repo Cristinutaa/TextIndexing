@@ -80,7 +80,6 @@ def generate_query(randomly=True, nb_terms=None):
         return __prepare_query__(query.upper(), False)
 
 
-
 def naive(query, dict_struct):
     """
     Words of the query are only separated with OR. The keyword OR is capitalized since or is just a word.

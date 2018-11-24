@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import sys
 
 # personal imports
 import dataReading
@@ -73,7 +74,7 @@ def main():
             else False
         if not ask_again:
             print("Fine, have a nice day!")
-            break
+            sys.exit()
         ranking.ask_query()
 
 
