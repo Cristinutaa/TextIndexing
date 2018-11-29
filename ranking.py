@@ -413,8 +413,9 @@ def prepare_query(query, random=True):
     if Configuration.random_indexing:
         _, context_vectors, model = \
             random_indexing.generate_vectors_and_model(Configuration.dimension_vector_random_indexing)
+        print("The initial terms of your query :", query_words)
         query_words = random_indexing.find_similar_terms(query_words, context_vectors, model)
-    print("query words :", query_words)
+    print("The terms of your query :", query_words)
     return query_words
 
 

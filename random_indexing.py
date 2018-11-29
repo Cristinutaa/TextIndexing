@@ -29,8 +29,8 @@ def build_index_and_context_vectors(inverted_dictionary, dimension_vector, nb_no
             else:
                 index_vectors[doc_id] = generate_index_vector(dimension_vector, nb_non_nulls)
                 context_vectors[term] += index_vectors[doc_id]
-    joblib.dump(index_vectors, r'resources/index_vectors.joblib')
-    joblib.dump(context_vectors, r'resources/context_vectors.joblib')
+    joblib.dump(index_vectors, Configuration.json_path + r'/index_vectors.joblib')
+    joblib.dump(context_vectors, Configuration.json_path + r'/context_vectors.joblib')
     return index_vectors, context_vectors
 
 
@@ -127,7 +127,7 @@ def train_clustering_algorithm(context_vectors, n_neighbors=5):
     """
     neigh = NearestNeighbors(n_neighbors=n_neighbors)
     neigh.fit(list(context_vectors.values()))
-    joblib.dump(neigh, r'resources/model_random_indexing.joblib')
+    joblib.dump(neigh, Configuration.json_path + r'/model_random_indexing.joblib')
     return neigh
 
 

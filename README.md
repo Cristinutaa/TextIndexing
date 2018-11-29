@@ -1,20 +1,33 @@
 # TextIndexing
 
+## Presentation
+This project is named "Indexing and Querying text". We have 732 files representing 131896 articles (475 Mo). They were written and published by LA Times between 1989 and 1990. The aim is to build an information retrieval system allowing to research key concepts/specified terms inside this set of articles. Our system will only work for conjonctive queries (i.e. OR). If we do not use the merge based system, the score of a term for a particular document is computed as the count of the word in the document. The score of a document for a specified query will then be computed as the mean of the scores of the query terms in the given document.
+
 ## Workflow
-There are 3 modules in our project, each one for a specific task.
+There are 7 python files in our project, each one for a specific task.
 ### 1/ Configuration
-Represented by configuration.py.
-It contains global variables to configure the program. The variables are commented.
+Represented by configuration.py. 
+It will analyse a json configuration file, which contains global variables to configure the program. The variables are commented.
 ### 2/ Data reading
 Represented by dataReading.py
-It allows, from a folder of document files, to build the data structures that the last module of the program, ranking, needs in order to work.
+It allows, from a folder of document files, to build the data structures that the other modules of the program (e.g. ranking) will need in order to work.
 ### 3/ Ranking
 Represented by ranking.py
 It asks the user to enter his/her query or generates a random query, and either with the naïve, Fagin’s Top k or Fagin’s threshold algorithms (user’s choice), delivers the ranking of the first documents for the given query terms.
+### 4/ Random_indexing
+Represented by random_indexing.py
+Once the terms of the query are defined, the user can choose to "enrich" the terms by finding synonyms or similar key concepts to the original terms.
+### 5/ Merge_based
+Represented by MergeBased.py
+???? TO COMPLETE ???? Moreover, in this part, the score of a term is defined as the product of the inverse-document-frequency and the term frequency.
+### 6/ Statistics
+Represented by statistics.py
+This file was used to generate statistics and plots about the performance of the different querying algorithms (Naive, Fagin’s Top k, Fagin’s threshold).
+### 7/ Main
+Represented by main.py
+This file concatenates the calls to all modules. The running of this file will allow the user to select/generate his data files, generate a query and display the interesting documents for this particular query.
 
-## What are the scores (to be completed/modified then)
-### Score of a term in a document
-To compute the score of a term in a document, we first use the count of the word in the document.
-### Score of a document for the query terms
-This is the mean of the scores of the query terms in the given document.
-
+##Example
+- Run the main.py file.
+- It will display "Do you want to use a configuration file (careful, it must be complete)?  (yes/anything else)". If you say "yes", you will need to specify the path to the configuration file (e.g. F:\laela\Desktop\PDC - Text Indexing\TextIndexing\configuration_samples\conf.json). A summary of the configuration properties will be displayed.
+- It will display "Do you want to create the structures from the data or to load pre-created structures from *your folder* (yes=create the structures/anything else=use pre-created)?".

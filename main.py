@@ -30,7 +30,7 @@ def main():
             dataReading.add_folder_inverted_dictionary(data_path)
             dataReading.create_inverted_list()
             print("The treatment took %s seconds" % (time.time() - startTime))
-            print("Nombre de documents %d" % dataReading.nb_documents)
+            print("Number of documents %d" % dataReading.nb_documents)
             toexport = input("Should we export the created structures from the data ?   (yes/anything else)")
             if toexport == "yes":
                 if not hasattr(Configuration, 'json_path'):

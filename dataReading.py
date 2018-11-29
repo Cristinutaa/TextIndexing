@@ -153,7 +153,6 @@ def get_structures():
         elif file == "doc_id_by_file.json":
             file = open(json_path + "\\" + file)
             doc_id_by_file = json.load(file)
-    print("dict_struct length:", len(dict_struct))
-    print("dict_list length:", len(dict_list))
-    print("doc_id_by_file length:", len(doc_id_by_file))
+    print("The number of terms:", len(dict_list))
+    print("The number of articles:", len(doc_id_by_file))
     return dict_struct, dict_list, doc_id_by_file

@@ -1,10 +1,8 @@
 {
     "stemming": "False",
-    "random_indexing" : "False",
+    "random_indexing" : "True",
     "merge_based" : "False",
     "dimension_vector_random_indexing" : 100,
-    "row_data_path": "F:/Ecole/Insa-5e_annee/Indexing/dataset/latimes",
-    "json_path" : "F:/Ecole/Insa-5e_annee/Indexing/bigjsons"
-    
-    
+    "row_data_path": "F:/laela/Desktop/latimes/latimes",
+    "json_path" : "F:/laela/Desktop/PDC - Text Indexing/resources"    
 }
