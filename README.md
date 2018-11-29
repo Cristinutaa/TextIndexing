@@ -1,9 +1,28 @@
 # TextIndexing
 
+
 ## Presentation
 This project is named "Indexing and Querying text". We have 732 files representing 131896 articles (475 Mo). They were written and published by LA Times between 1989 and 1990. The aim is to build an information retrieval system allowing to research key concepts/specified terms inside this set of articles. Our system will only work for conjonctive queries (i.e. OR). If we do not use the merge based system, the score of a term for a particular document is computed as the count of the word in the document. The score of a document for a specified query will then be computed as the mean of the scores of the query terms in the given document.
 
-## Workflow
+##User's Manual
+Run the main.py file. ???? CAN BE COMPLETED WITH MERGE BASED ??????
+
+###Configuration
+It will display "Do you want to use a configuration file (careful, it must be complete)?  (yes/anything else)". If you say "yes", you will need to specify the path to the configuration file (e.g. F:\laela\Desktop\PDC - Text Indexing\TextIndexing\configuration_samples\conf.json). A summary of the configuration properties will be displayed.
+
+###Getting structures
+It will display "Do you want to create the structures from the data or to load pre-created structures from *your folder* (yes=create the structures/anything else=use pre-created)?".
+
+###Querying
+It will display "Do you want to query something? (yes/no)". You should say "yes". Then , you can choose "Do you want to randomly generate a query ? (yes/no)". If your answer is yes, it will ask "Please specify a number of terms (anything else for a number between 1 and 4):". If your answer is no, it will ask to enter your query.
+
+####Random indexing
+It will display "Do you want to query something? (yes/no)". You should say "yes". Then , you can choose "Do you want to randomly generate a query ? (yes/no)". If your answer is yes, it will ask "Please specify a number of terms (anything else for a number between 1 and 4):". If your answer is no, it will ask to enter your query.
+
+Then, you can choose which query algorithm will be used : "Do you want to use naive, fagin's or fagin's threshold algorithm? Naive:0, Fagin's:1, Fagin's threshold:2". The result will then be displayed under the format "RANK:1 - DOC_ID:197774". You can then display the content of a document "What is the id of the document to display ? (e.g. 2)".
+
+
+## Code Structure
 There are 7 python files in our project, each one for a specific task.
 ### 1/ Configuration
 Represented by configuration.py. 
@@ -27,19 +46,3 @@ This file was used to generate statistics and plots about the performance of the
 Represented by main.py
 This file concatenates the calls to all modules. The running of this file will allow the user to select/generate his data files, generate a query and display the interesting documents for this particular query.
 
-##Example of the process
-Run the main.py file. ???? CAN BE COMPLETED WITH MERGE BASED ??????
-
-###Configuration
-It will display "Do you want to use a configuration file (careful, it must be complete)?  (yes/anything else)". If you say "yes", you will need to specify the path to the configuration file (e.g. F:\laela\Desktop\PDC - Text Indexing\TextIndexing\configuration_samples\conf.json). A summary of the configuration properties will be displayed.
-
-###Getting structures
-It will display "Do you want to create the structures from the data or to load pre-created structures from *your folder* (yes=create the structures/anything else=use pre-created)?".
-
-###Querying
-It will display "Do you want to query something? (yes/no)". You should say "yes". Then , you can choose "Do you want to randomly generate a query ? (yes/no)". If your answer is yes, it will ask "Please specify a number of terms (anything else for a number between 1 and 4):". If your answer is no, it will ask to enter your query.
-
-####Random indexing
-It will display "Do you want to query something? (yes/no)". You should say "yes". Then , you can choose "Do you want to randomly generate a query ? (yes/no)". If your answer is yes, it will ask "Please specify a number of terms (anything else for a number between 1 and 4):". If your answer is no, it will ask to enter your query.
-
-Then, you can choose which query algorithm will be used : "Do you want to use naive, fagin's or fagin's threshold algorithm? Naive:0, Fagin's:1, Fagin's threshold:2". The result will then be displayed under the format "RANK:1 - DOC_ID:197774". You can then display the content of a document "What is the id of the document to display ? (e.g. 2)".
