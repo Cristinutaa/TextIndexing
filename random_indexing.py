@@ -58,17 +58,20 @@ def find_similar_terms(terms_of_query, context_vectors, model):
     """
     start_time = time.time()
     context_vectors_for_specific_terms = [context_vectors[term] for term in terms_of_query]
-    _, indexes = model.kneighbors(context_vectors_for_specific_terms, return_distance=True)
-    terms = list(context_vectors.keys())
-    similar_terms = []
-    for i, term_of_query in enumerate(terms_of_query):
-        result_for_term = "term: " + term_of_query + " - similar terms: "
-        for j, index in enumerate(indexes[i]):
-            result_for_term += terms[index] + " / "
-            similar_terms.append(terms[index])
-        #print(result_for_term)
-    #print("time spent:", time.time() - start_time)
-    return similar_terms
+    try:
+        _, indexes = model.kneighbors(context_vectors_for_specific_terms, return_distance=True)
+        terms = list(context_vectors.keys())
+        similar_terms = []
+        for i, term_of_query in enumerate(terms_of_query):
+            result_for_term = "term: " + term_of_query + " - similar terms: "
+            for j, index in enumerate(indexes[i]):
+                result_for_term += terms[index] + " / "
+                similar_terms.append(terms[index])
+            #print(result_for_term)
+        print("time spent:", time.time() - start_time)
+        return similar_terms
+    except ValueError:
+        return []
 
 
 def generate_index_vector(dimension_vector, nb_non_nulls):
@@ -132,6 +135,7 @@ def train_clustering_algorithm(context_vectors, n_neighbors=5):
 
 
 if __name__ == "__main__":
+    Configuration.json_path = input("Please specify path where to save/load jolib : ")
     index_vectors, context_vectors, model = generate_vectors_and_model()
 
     while input("Do you want to find similar terms ? (yes/no)\n").lower() == "yes":
