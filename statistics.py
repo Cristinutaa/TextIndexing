@@ -1,6 +1,8 @@
+from configuration import Configuration
+
 import plotly
 import plotly.plotly as py
-plotly.tools.set_credentials_file(username='Cristinutaa', api_key='QlargHTih8SSyndn04fa')
+plotly.tools.set_credentials_file(username=Configuration.username_statistics, api_key=Configuration.api_statistics)
 # https://plot.ly/~Cristinutaa/#/
 import plotly.graph_objs as go
 from ranking import generate_query, naive, fagins_topk, fagins_ta, get_structures

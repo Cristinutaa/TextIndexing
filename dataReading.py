@@ -95,6 +95,7 @@ def add_folder_inverted_dictionary(data_folder, temp_folder=None):
                         save_inverted(nb_documents / 1000, temp_folder)
     if Configuration.merge_based :
         save_inverted(nb_documents/1000 + 1, temp_folder)
+        save_dictionary_doc_by_id(doc_id_by_file)
 
 
 def create_inverted_list():
@@ -130,6 +131,13 @@ def save_inverted(number, temp_folder):
     file.close()
     inverted_dictionary = {}
     inverted_list = {}
+
+
+def save_dictionary_doc_by_id(doc_id_by_file):
+    json_list = json.dumps(doc_id_by_file)
+    f = open(Configuration.json_path + "/doc_id_by_file.json", "w")
+    f.write(json_list)
+    f.close()
 
 
 def delete_folder_files(folder):

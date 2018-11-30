@@ -38,6 +38,8 @@ class Configuration():
             Configuration.json_path = conf["json_path"]  # path where to save or load the json structures and the
                                                          # doc_id_by_file.
             Configuration.dimension_vector_random_indexing = conf["dimension_vector_random_indexing"]
+            Configuration.username_statistics = conf["username_statistics"]
+            Configuration.api_statistics = conf["api_statistics"]
         else:  # Configurations to enter
             # 1/ Stemming or not
             choice = input("Do you want to use stemming?  (yes/anything else)")
@@ -70,6 +72,10 @@ class Configuration():
             Configuration.row_data_path = input("Please specify path to data : ")
             # 5/ Json path
             Configuration.json_path = input("Please specify path where to save/load jsons : ")
+            # 6/ Statistics username
+            Configuration.username_statistics = input("Please specify the username of plotly for the statistics : ")
+            # 7/ Statistics api
+            Configuration.api_statistics = input("Please specify the api_key of plotly for the statistics : ")
 
 
 

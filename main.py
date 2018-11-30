@@ -69,9 +69,6 @@ def main():
             print("Fine. Fetching json files from " + Configuration.json_path + "...")
             dict_struct, dict_list, doc_id_by_file = dataReading.get_structures()
 
-    # QUERYING : Contrarily to the independent module, we can directly use the values we got earlier
-    # Query as much as you need
-    print("\n\n--------------- Querying -----------------")
     # 1/ Init a query process
     if Configuration.merge_based:
         temp = "./temp_ressources"  # Temporary directory to put blocks of structure
@@ -90,9 +87,15 @@ def main():
                    " => it won't be possible to "
                    "display the documents.")
         #print("doc_id_by_file:", doc_id_by_file)
+        # QUERYING : Contrarily to the independent module, we can directly use the values we got earlier
+        # Query as much as you need
+        print("\n\n--------------- Querying -----------------")
         query_process = ranking.QueryProcess(doc_id_by_file, merge_based=mb)
         pass
     else:
+        # QUERYING : Contrarily to the independent module, we can directly use the values we got earlier
+        # Query as much as you need
+        print("\n\n--------------- Querying -----------------")
         query_process = ranking.QueryProcess(doc_id_by_file, dict_struct=dict_struct, dict_list=dict_list)
     while True:
         ask_again = True if input("Do you want to query something? (yes/no)\n").lower() == "yes" \
