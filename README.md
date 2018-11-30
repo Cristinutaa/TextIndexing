@@ -43,6 +43,7 @@ This part generates an inverted file from the partial ones. It works by merging 
 Represented by score.py
 Just a method to calculate tf-idf.
 ### 7/ Statistics
+[Currently doesn't work due to code refactoring]
 Represented by statistics.py
 This file was used to generate statistics and plots about the performance of the different querying algorithms (Naive, Fagin’s Top k, Fagin’s threshold).
 ### 8/ Main
