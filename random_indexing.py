@@ -36,7 +36,6 @@ class Random_Indexing:
                 else:
                     self.index_vectors[doc_id] = self.__generate_index_vector__()
                     self.context_vectors[term] += (self.index_vectors[doc_id]*frequency)
-        self.__save_index_and_context_vectors__()
 
     def __check_terms_exist__(self, terms_to_check):
         """
@@ -116,7 +115,7 @@ class Random_Indexing:
             self.__train_clustering_algorithm__()
             #print("time spent to train the model:", time.time() - start_time)
 
-    def __save_index_and_context_vectors__(self):
+    def save_index_and_context_vectors(self):
         """
         Used by the method build_index_and_context_vectors.
         Once the index vectors and context vectors have been computed, we should save it as joblib

@@ -24,6 +24,8 @@ class DataReading:
         self.inverted_dictionary = dict()
         self.inverted_list = dict()
         self.nb_documents = 0
+        if Configuration.random_indexing:
+            self.ri = Random_Indexing(Configuration.dimension_vector_random_indexing)
 
 
     def update_inverted_dictionary(self, array, doc_id):
@@ -89,6 +91,8 @@ class DataReading:
         :param data_folder: data folder
         :return:
         """
+        if Configuration.random_indexing:
+            self.ri = Random_Indexing(Configuration.dimension_vector_random_indexing)
         for file in os.listdir(data_folder):
             if "." not in file:
                 with open(data_folder + "/" + file, "r") as my_file:
@@ -101,9 +105,12 @@ class DataReading:
                         self.add_doc_inverted_dictionary(doc, doc_id)
                         if self.nb_documents % 1000 == 0 and Configuration.merge_based :
                             self.save_inverted(self.nb_documents / 1000, temp_folder)
+                            self.ri.build_index_and_context_vectors(self.inverted_dictionary) \
+                                if Configuration.random_indexing else None
         if Configuration.random_indexing:
-            ri = Random_Indexing(Configuration.dimension_vector_random_indexing)
-            ri.build_index_and_context_vectors(self.inverted_dictionary)
+            if not Configuration.merge_based:
+                self.ri.build_index_and_context_vectors(self.inverted_dictionary)
+            self.ri.save_index_and_context_vectors()
         if Configuration.merge_based:
             self.save_inverted(self.nb_documents/1000 + 1, temp_folder)
             self.save_dictionary_doc_by_id()
