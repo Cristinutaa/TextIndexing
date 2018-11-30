@@ -113,7 +113,7 @@ class DataReading:
             self.save_inverted(self.nb_documents/1000 + 1, temp_folder)
             self.save_dictionary_doc_by_id()
         if Configuration.random_indexing:
-            self.ri.build_index_and_context_vectors(self.inverted_dictionary) if Configuration.merge_based else None
+            self.ri.build_index_and_context_vectors(self.inverted_dictionary) if not Configuration.merge_based else None
             self.ri.save_index_and_context_vectors()
 
 

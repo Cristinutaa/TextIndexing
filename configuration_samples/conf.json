@@ -1,6 +1,6 @@
 {
     "stemming": "False",
-    "random_indexing" : "True",
+    "random_indexing" : "False",
     "merge_based" : "False",
     "dimension_vector_random_indexing" : 10,
     "row_data_path": "F:/laela/Desktop/latimes/latimes",
