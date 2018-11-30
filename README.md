@@ -2,7 +2,7 @@
 
 
 ## Presentation
-This project is named "Indexing and Querying text". We have 732 files representing 131896 articles (475 Mo). They were written and published in english by LA Times between 1989 and 1990. The aim is to build an information retrieval system allowing to research key concepts/specified terms inside this set of articles. Our system will only work for conjonctive queries (i.e. OR). If we do not use the merge based system, the score of a term for a particular document is computed as the count of the word in the document. The score of a document for a specified query will then be computed as the mean of the scores of the query terms in the given document.
+This project is named "Indexing and Querying text". We have 732 files representing 131896 articles (475 Mo). They were written and published in english by LA Times between 1989 and 1990. The aim is to build an information retrieval system allowing to research key concepts/specified terms inside this set of articles. Our system will only work for disjonctive queries (i.e. OR). The score of a term for a particular document is computed as the TF-IDF. The score of a document for a specified query will then be computed as the mean of the scores of the query terms in the given document.
 
 ## User's Manual
 Run the main.py file.
