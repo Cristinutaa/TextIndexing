@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 import operator
 
 #personal imports
-import random_indexing
+from random_indexing import Random_Indexing
 from configuration import Configuration
 from MergeBased import MergeBased
 
@@ -92,7 +92,6 @@ class QueryProcess:
             self.fagins_ta(K, epsilon)
         self.display_result_query()
         print("size of result:", len(self.ranked_docs))
-        print("time spent:", self.duration)
 
     def naive(self):
         """
@@ -411,10 +410,10 @@ def prepare_query(query, random=True):
         if Configuration.stemming and not random:
             query_words[i] = ps.stem(query_words[i]) # finally, we stem the word
     if Configuration.random_indexing:
-        _, context_vectors, model = \
-            random_indexing.generate_vectors_and_model(Configuration.dimension_vector_random_indexing)
+        ri = Random_Indexing(Configuration.dimension_vector_random_indexing)
+        ri.download_vectors_and_model()
         print("The initial terms of your query :", query_words)
-        query_words = random_indexing.find_similar_terms(query_words, context_vectors, model)
+        query_words = ri.find_similar_terms(query_words)
     print("The terms of your query :", query_words)
     return query_words
 

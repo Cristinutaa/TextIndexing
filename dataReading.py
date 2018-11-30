@@ -12,6 +12,7 @@ from nltk.stem import PorterStemmer
 
 # personal imports
 from configuration import Configuration
+from random_indexing import Random_Indexing
 import score
 
 class DataReading:
@@ -100,7 +101,10 @@ class DataReading:
                         self.add_doc_inverted_dictionary(doc, doc_id)
                         if self.nb_documents % 1000 == 0 and Configuration.merge_based :
                             self.save_inverted(self.nb_documents / 1000, temp_folder)
-        if Configuration.merge_based :
+        if Configuration.random_indexing:
+            ri = Random_Indexing(Configuration.dimension_vector_random_indexing)
+            ri.build_index_and_context_vectors(self.inverted_dictionary)
+        if Configuration.merge_based:
             self.save_inverted(self.nb_documents/1000 + 1, temp_folder)
             self.save_dictionary_doc_by_id()
 
