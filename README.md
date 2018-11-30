@@ -5,7 +5,7 @@
 This project is named "Indexing and Querying text". We have 732 files representing 131896 articles (475 Mo). They were written and published in english by LA Times between 1989 and 1990. The aim is to build an information retrieval system allowing to research key concepts/specified terms inside this set of articles. Our system will only work for conjonctive queries (i.e. OR). If we do not use the merge based system, the score of a term for a particular document is computed as the count of the word in the document. The score of a document for a specified query will then be computed as the mean of the scores of the query terms in the given document.
 
 ## User's Manual
-Run the main.py file. ???? CAN BE COMPLETED WITH MERGE BASED ??????
+Run the main.py file.
 
 ### Configuration
 It will display "Do you want to use a configuration file (careful, it must be complete)?  (yes/anything else)". If you say "yes", you will need to specify the path to the configuration file (e.g. F:\laela\Desktop\PDC - Text Indexing\TextIndexing\configuration_samples\conf.json). A summary of the configuration properties will be displayed.
@@ -29,7 +29,7 @@ Represented by configuration.py.
 It will analyse a json configuration file, which contains global variables to configure the program. The variables are commented.
 ### 2/ Data reading
 Represented by dataReading.py
-It allows, from a folder of document files, to build the data structures that the other modules of the program (e.g. ranking) will need in order to work.
+It allows, from a folder of document files, to build the data structures that the other modules of the program (e.g. ranking) will need in order to work. If we work with the merge-based algorithm, it generates the partial inverted files. Otherwise, it generates the final inverted file directly.
 ### 3/ Ranking
 Represented by ranking.py
 It asks the user to enter his/her query or generates a random query, and either with the naïve, Fagin’s Top k or Fagin’s threshold algorithms (user’s choice), delivers the ranking of the first documents for the given query terms.
@@ -38,7 +38,7 @@ Represented by random_indexing.py
 Once the terms of the query are defined, the user can choose to "enrich" the terms by finding synonyms or similar key concepts to the original terms.
 ### 5/ Merge_based
 Represented by MergeBased.py
-???? TO COMPLETE ???? Moreover, in this part, the score of a term is defined as the product of the inverse-document-frequency and the term frequency.
+This part generates an inverted file from the partial ones. It works by merging the similar words among the first lines of the partial inverted files, and appending the word with its score, calculated with TF-IDF, to the final inverted file. We work with binary inverted files for more efficiency.
 ### 6/ Statistics
 Represented by statistics.py
 This file was used to generate statistics and plots about the performance of the different querying algorithms (Naive, Fagin’s Top k, Fagin’s threshold).
