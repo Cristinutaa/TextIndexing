@@ -104,16 +104,17 @@ class DataReading:
                         self.doc_id_by_file[doc_id] = (data_folder + "\\" + file)
                         self.add_doc_inverted_dictionary(doc, doc_id)
                         if self.nb_documents % 1000 == 0 and Configuration.merge_based :
-                            self.save_inverted(self.nb_documents / 1000, temp_folder)
                             self.ri.build_index_and_context_vectors(self.inverted_dictionary) \
                                 if Configuration.random_indexing else None
-        if Configuration.random_indexing:
-            if not Configuration.merge_based:
-                self.ri.build_index_and_context_vectors(self.inverted_dictionary)
-            self.ri.save_index_and_context_vectors()
+                            self.save_inverted(self.nb_documents / 1000, temp_folder)
         if Configuration.merge_based:
+            self.ri.build_index_and_context_vectors(self.inverted_dictionary) \
+                if Configuration.random_indexing else None
             self.save_inverted(self.nb_documents/1000 + 1, temp_folder)
             self.save_dictionary_doc_by_id()
+        if Configuration.random_indexing:
+            self.ri.build_index_and_context_vectors(self.inverted_dictionary) if Configuration.merge_based else None
+            self.ri.save_index_and_context_vectors()
 
 
     def create_inverted_list(self):
