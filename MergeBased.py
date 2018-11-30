@@ -2,6 +2,7 @@ import os
 import pickle
 import math
 
+import score
 
 class MergeBased:
     def __init__( self, dir_input , file_output_binary , nb_documents):
@@ -89,14 +90,6 @@ class MergeBased:
 
         all_fichier.close()'''
 
-    # Gives the score for a term with regards to a document
-    # n : Frequency of the term in the document
-    # d : Number of documents that contain the term
-    def tf_idf(self, n, d):
-        score = 0
-        if n > 0:
-            score = (1 + math.log(n)) * math.log(self.nb_documents / (1 + d))
-        return round(score, 2)
 
     def calculate_scores(self , record):
 
@@ -116,7 +109,7 @@ class MergeBased:
         for i in range( 0 , number_docs ):
             new_record +=  scores[i].split(':')[0] + ":"
 
-            score_element = self.tf_idf( int(scores[i].split(':')[1]) , number_docs  )
+            score_element = score.tf_idf( int(scores[i].split(':')[1]) , number_docs , self.nb_documents )
 
             new_record += str( score_element ) + ";"
 

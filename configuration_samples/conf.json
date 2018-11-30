@@ -1,10 +1,10 @@
 {
     "stemming": "False",
-    "random_indexing" : "True",
+    "random_indexing" : "False",
     "merge_based" : "False",
     "dimension_vector_random_indexing" : 100,
-    "row_data_path": "F:/laela/Desktop/latimes/latimes",
-    "json_path" : "F:/laela/Desktop/PDC - Text Indexing/resources", 
+    "row_data_path": "D:\DATA\Documents\INFO\TextIndexing\latimes",
+    "json_path" : "D:\DATA\Documents\INFO\TextIndexing\\temp",
     "username_statistics" : "Cristinutaa", 
     "api_statistics" : "QlargHTih8SSyndn04fa"
 }

@@ -39,10 +39,13 @@ Once the terms of the query are defined, the user can choose to "enrich" the ter
 ### 5/ Merge_based
 Represented by MergeBased.py
 This part generates an inverted file from the partial ones. It works by merging the similar words among the first lines of the partial inverted files, and appending the word with its score, calculated with TF-IDF, to the final inverted file. We work with binary inverted files for more efficiency.
-### 6/ Statistics
+### 6/ Score
+Represented by score.py
+Just a method to calculate tf-idf.
+### 7/ Statistics
 Represented by statistics.py
 This file was used to generate statistics and plots about the performance of the different querying algorithms (Naive, Fagin’s Top k, Fagin’s threshold).
-### 7/ Main
+### 8/ Main
 Represented by main.py
 This file concatenates the calls to all modules. The running of this file will allow the user to select/generate his data files, generate a query and display the interesting documents for this particular query.
 

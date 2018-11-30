@@ -51,7 +51,7 @@ class QueryProcess:
         nb_terms = None
         candidate_terms = []  # only used when q_generation = True. In this case, will be filled.
         if q_generation:
-            nb_terms = input("Please specify a number of terms (anything else for a number between 1 and 4):    ")
+            nb_terms = input("Please specify a number of terms (any number between 1 and 4):    ")
             try:
                 nb_terms = int(nb_terms)
                 if nb_terms < 1:
@@ -86,7 +86,7 @@ class QueryProcess:
         else:
             K = int(input("Please enter K:  "))
             try:
-                epsilon = float(input("Please enter an epsilon (anything that's not a number for not using it): \n"))
+                epsilon = float(input("Please enter an epsilon (if you don't want to use an epsilon, enter anything that's not a number): \n"))
             except:
                 epsilon = None
             self.fagins_ta(K, epsilon)

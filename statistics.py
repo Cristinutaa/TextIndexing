@@ -5,7 +5,9 @@ import plotly.plotly as py
 plotly.tools.set_credentials_file(username=Configuration.username_statistics, api_key=Configuration.api_statistics)
 # https://plot.ly/~Cristinutaa/#/
 import plotly.graph_objs as go
-from ranking import generate_query, naive, fagins_topk, fagins_ta, get_structures
+
+import ranking
+from ranking import generate_query_terms, naive, fagins_topk, fagins_ta, get_structures
 
 
 # Creates the graphics
@@ -31,7 +33,7 @@ def stats_naive_topk(dict_struct, dict_list, k=10, nb_queries=20, max_terms=20):
         sum_topk = 0 
 #       Creates and apply algorithms on nb_queries queries of length i
         for j in range(nb_queries):
-            query = generate_query(True, i, dict_struct, dict_list)
+            query = generate_query_terms(True, i, dict_struct, dict_list)
             _, duration_naive = naive(query, dict_struct)
             sum_naive += duration_naive        
             _, duration_topk = fagins_topk(query, k, dict_struct, dict_list)
@@ -164,5 +166,6 @@ def stats_ta(epsilon_list, dict_struct, dict_list, nb_queries=20, max_terms=20):
 
 
 if __name__ == "__main__":
-    dict_struct, dict_list, corpus_by_doc_id = get_structures()
+    dict_struct, dict_list, doc_id_by_file = get_structures()
+    query_process = ranking.QueryProcess(doc_id_by_file, merge_based=mb) if Configuration.merge_based else ranking.QueryProcess(doc_id_by_file, dict_struct=dict_struct, dict_list=dict_list)
 
